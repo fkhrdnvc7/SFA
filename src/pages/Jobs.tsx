@@ -137,7 +137,7 @@ const Jobs = () => {
                 Yangi ish
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="w-[95vw] max-w-md">
               <DialogHeader>
                 <DialogTitle>Yangi ish yaratish</DialogTitle>
                 <DialogDescription>
