@@ -27,6 +27,7 @@ interface Job {
   created_at: string;
   notes?: string;
   total_estimated_amount: number;
+  job_items?: { color?: string }[];
 }
 
 const Jobs = () => {
@@ -54,7 +55,10 @@ const Jobs = () => {
     try {
       const { data, error } = await supabase
         .from('jobs')
-        .select('*')
+        .select(`
+          *,
+          job_items (color)
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -65,6 +69,18 @@ const Jobs = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const getUniqueColors = (job: Job) => {
+    if (!job.job_items || job.job_items.length === 0) return [];
+    const colorsSet = new Set<string>();
+    job.job_items.forEach(item => {
+      if (item.color) {
+        const colorList = item.color.split(',').map(c => c.trim()).filter(c => c);
+        colorList.forEach(c => colorsSet.add(c));
+      }
+    });
+    return Array.from(colorsSet);
   };
 
   const handleCreateJob = async (e: React.FormEvent) => {
@@ -137,7 +153,7 @@ const Jobs = () => {
                 Yangi ish
               </Button>
             </DialogTrigger>
-            <DialogContent className="w-[95vw] max-w-md">
+            <DialogContent>
               <DialogHeader>
                 <DialogTitle>Yangi ish yaratish</DialogTitle>
                 <DialogDescription>
@@ -218,13 +234,29 @@ const Jobs = () => {
                     {new Date(job.created_at).toLocaleDateString('uz-UZ')}
                   </CardDescription>
                 </CardHeader>
-                {job.notes && (
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground line-clamp-2">
+                <CardContent>
+                  {job.notes && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
                       {job.notes}
                     </p>
-                  </CardContent>
-                )}
+                  )}
+                  {job.status === 'yopiq' && (
+                    <div className="mt-2">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Ranglar:</p>
+                      {getUniqueColors(job).length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {getUniqueColors(job).map((color, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {color}
+                            </Badge>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">Ranglar ko'rsatilmagan</p>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
               </Card>
             ))}
           </div>

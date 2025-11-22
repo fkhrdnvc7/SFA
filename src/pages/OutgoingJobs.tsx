@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface IncomingJob {
   id: string;
@@ -61,7 +60,7 @@ const OutgoingJobs = () => {
         .eq('id', id)
         .single();
       if (incomingError) throw incomingError;
-      setIncomingJob(incomingData as any);
+      setIncomingJob(incomingData);
 
       const { data: outgoingData, error: outgoingError } = await supabase
         .from('outgoing_jobs')
@@ -70,7 +69,7 @@ const OutgoingJobs = () => {
         .order('date', { ascending: false })
         .order('created_at', { ascending: false });
       if (outgoingError) throw outgoingError;
-      setOutgoingJobs(outgoingData as any || []);
+      setOutgoingJobs(outgoingData || []);
     } catch (error) {
       toast.error("Ma'lumotlarni yuklashda xatolik");
     } finally {
@@ -96,12 +95,12 @@ const OutgoingJobs = () => {
         const { error } = await supabase
           .from('outgoing_jobs')
           .insert({
-            incoming_job_id: id as string,
+            incoming_job_id: id,
             quantity_sent: parseInt(quantitySent),
             notes: notes || null,
             date,
-            created_by: user?.id as string,
-          } as any);
+            created_by: user?.id,
+          });
         if (error) throw error;
         toast.success("Qo'shildi");
       }
@@ -176,20 +175,20 @@ const OutgoingJobs = () => {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/outgoing-jobs-list')} className="flex-shrink-0">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/outgoing-jobs-list')}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <h1 className="text-2xl sm:text-3xl font-bold">{incomingJob.job_name}</h1>
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold">{incomingJob.job_name}</h1>
               {isCompleted ? (
-                <Badge className="bg-green-500 flex-shrink-0">To'liq tugagan</Badge>
+                <Badge className="bg-green-500">To'liq tugagan</Badge>
               ) : (
-                <Badge variant="secondary" className="flex-shrink-0">Jarayonda</Badge>
+                <Badge variant="secondary">Jarayonda</Badge>
               )}
             </div>
-            <p className="text-sm sm:text-base text-muted-foreground mt-1">
+            <p className="text-muted-foreground mt-1">
               Kelgan: {incomingJob.quantity} | Ketgan: {totalSent} | Qolgan: {remaining}
             </p>
           </div>
@@ -200,55 +199,49 @@ const OutgoingJobs = () => {
                 Ketgan ish qo'shish
               </Button>
             </DialogTrigger>
-            <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-hidden flex flex-col gap-0">
-              <DialogHeader className="flex-shrink-0">
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
                 <DialogTitle>{editingJob ? "Tahrirlash" : "Ketgan ish qo'shish"}</DialogTitle>
                 <DialogDescription>
                   Ketgan ish haqida ma'lumot kiriting
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-                <ScrollArea className="flex-1 px-1">
-                  <div className="space-y-4 pr-3 pb-2">
-                    <div className="space-y-2">
-                      <Label>Ketgan soni *</Label>
-                      <Input
-                        type="number"
-                        value={quantitySent}
-                        onChange={(e) => setQuantitySent(e.target.value)}
-                        placeholder="0"
-                        max={remaining}
-                        required
-                      />
-                      <p className="text-sm text-muted-foreground">
-                        Maksimal: {remaining}
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Sana *</Label>
-                      <Input
-                        type="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Izoh</Label>
-                      <Textarea
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder="Qo'shimcha ma'lumot..."
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                </ScrollArea>
-                <div className="flex-shrink-0 pt-4 border-t mt-2">
-                  <Button type="submit" className="w-full">
-                    {editingJob ? "Yangilash" : "Saqlash"}
-                  </Button>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Ketgan soni *</Label>
+                  <Input
+                    type="number"
+                    value={quantitySent}
+                    onChange={(e) => setQuantitySent(e.target.value)}
+                    placeholder="0"
+                    max={remaining}
+                    required
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Maksimal: {remaining}
+                  </p>
                 </div>
+                <div className="space-y-2">
+                  <Label>Sana *</Label>
+                  <Input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Izoh</Label>
+                  <Textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Qo'shimcha ma'lumot..."
+                    rows={3}
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  {editingJob ? "Yangilash" : "Saqlash"}
+                </Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -258,58 +251,56 @@ const OutgoingJobs = () => {
           <CardHeader>
             <CardTitle>Ketgan ishlar ro'yxati</CardTitle>
           </CardHeader>
-          <CardContent className="p-0 sm:p-6">
+          <CardContent>
             {outgoingJobs.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-lg mb-2">Ketgan ishlar yo'q</p>
                 <p className="text-muted-foreground">Yangi ketgan ish qo'shish uchun yuqoridagi tugmani bosing</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="whitespace-nowrap">Sana</TableHead>
-                      <TableHead className="whitespace-nowrap">Ketgan soni</TableHead>
-                      <TableHead className="whitespace-nowrap">Berish raqami</TableHead>
-                      <TableHead className="whitespace-nowrap">Izoh</TableHead>
-                      <TableHead className="whitespace-nowrap text-right">Amallar</TableHead>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Sana</TableHead>
+                    <TableHead>Ketgan soni</TableHead>
+                    <TableHead>Berish raqami</TableHead>
+                    <TableHead>Izoh</TableHead>
+                    <TableHead className="text-right">Amallar</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {outgoingJobs.map((job, index) => (
+                    <TableRow key={job.id}>
+                      <TableCell>{new Date(job.date).toLocaleDateString('uz-UZ')}</TableCell>
+                      <TableCell className="font-medium">{job.quantity_sent}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{outgoingJobs.length - index}-marta</Badge>
+                      </TableCell>
+                      <TableCell>{job.notes || '—'}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleEdit(job)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive"
+                            onClick={() => handleDelete(job.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {outgoingJobs.map((job, index) => (
-                      <TableRow key={job.id}>
-                        <TableCell className="whitespace-nowrap">{new Date(job.date).toLocaleDateString('uz-UZ')}</TableCell>
-                        <TableCell className="font-medium whitespace-nowrap">{job.quantity_sent}</TableCell>
-                        <TableCell className="whitespace-nowrap">
-                          <Badge variant="outline">{outgoingJobs.length - index}-marta</Badge>
-                        </TableCell>
-                        <TableCell className="whitespace-nowrap">{job.notes || '—'}</TableCell>
-                        <TableCell className="text-right whitespace-nowrap">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleEdit(job)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-destructive"
-                              onClick={() => handleDelete(job.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                  ))}
+                </TableBody>
+              </Table>
             )}
           </CardContent>
         </Card>

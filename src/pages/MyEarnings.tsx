@@ -34,10 +34,18 @@ interface JobItem {
   };
 }
 
+interface JobEarnings {
+  job_id: string;
+  job_name: string;
+  total_earnings: number;
+  item_count: number;
+}
+
 const MyEarnings = () => {
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
   const [jobItems, setJobItems] = useState<JobItem[]>([]);
+  const [jobEarnings, setJobEarnings] = useState<JobEarnings[]>([]);
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -72,6 +80,25 @@ const MyEarnings = () => {
       }, 0) || 0;
       
       setTotalEarnings(total);
+
+      // Calculate earnings per job
+      const earningsByJob = new Map<string, JobEarnings>();
+      data?.forEach((item: JobItem) => {
+        const earnings = (item.quantity * item.unit_price) + (item.bonus_amount || 0);
+        const existing = earningsByJob.get(item.job_id);
+        if (existing) {
+          existing.total_earnings += earnings;
+          existing.item_count += 1;
+        } else {
+          earningsByJob.set(item.job_id, {
+            job_id: item.job_id,
+            job_name: item.jobs?.job_name || 'Noma\'lum',
+            total_earnings: earnings,
+            item_count: 1,
+          });
+        }
+      });
+      setJobEarnings(Array.from(earningsByJob.values()).sort((a, b) => b.total_earnings - a.total_earnings));
     } catch (error) {
       console.error('Error fetching earnings:', error);
       toast.error("Daromadlarni yuklashda xatolik");
@@ -139,6 +166,42 @@ const MyEarnings = () => {
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Har bir ishdan daromad</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Ish nomi</TableHead>
+                  <TableHead>Elementlar soni</TableHead>
+                  <TableHead className="text-right">Jami daromad</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {jobEarnings.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center text-muted-foreground">
+                      Hali ishlar yo'q
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  jobEarnings.map((job) => (
+                    <TableRow key={job.job_id}>
+                      <TableCell className="font-medium">{job.job_name}</TableCell>
+                      <TableCell>{job.item_count}</TableCell>
+                      <TableCell className="text-right font-semibold">
+                        {formatCurrency(job.total_earnings)}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>

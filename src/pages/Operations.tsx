@@ -5,7 +5,7 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Scissors } from "lucide-react";
+import { Plus, Scissors, Edit, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +40,7 @@ const Operations = () => {
   const [operations, setOperations] = useState<Operation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [editingOperation, setEditingOperation] = useState<Operation | null>(null);
   
   // Form state
   const [name, setName] = useState("");
@@ -61,7 +62,7 @@ const Operations = () => {
       const { data, error } = await supabase
         .from('operations')
         .select('*')
-        .order('name');
+        .order('code', { ascending: true, nullsFirst: false });
 
       if (error) throw error;
       setOperations(data || []);
@@ -89,15 +90,74 @@ const Operations = () => {
       if (error) throw error;
 
       toast.success("Operatsiya muvaffaqiyatli yaratildi");
-      setName("");
-      setCode("");
-      setDefaultPrice("");
+      resetForm();
       setOpen(false);
       fetchOperations();
     } catch (error: any) {
       console.error('Error creating operation:', error);
       toast.error("Operatsiya yaratishda xatolik");
     }
+  };
+
+  const handleUpdateOperation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingOperation || !name.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from('operations')
+        .update({
+          name: name,
+          code: code || null,
+          default_price: defaultPrice ? parseFloat(defaultPrice) : 0,
+        })
+        .eq('id', editingOperation.id);
+
+      if (error) throw error;
+
+      toast.success("Operatsiya muvaffaqiyatli yangilandi");
+      resetForm();
+      setEditingOperation(null);
+      setOpen(false);
+      fetchOperations();
+    } catch (error: any) {
+      console.error('Error updating operation:', error);
+      toast.error("Operatsiya yangilashda xatolik");
+    }
+  };
+
+  const handleDeleteOperation = async (id: string) => {
+    if (!confirm("Ushbu operatsiyani o'chirmoqchimisiz?")) return;
+
+    try {
+      const { error } = await supabase
+        .from('operations')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success("Operatsiya o'chirildi");
+      fetchOperations();
+    } catch (error: any) {
+      console.error('Error deleting operation:', error);
+      toast.error("Operatsiyani o'chirishda xatolik");
+    }
+  };
+
+  const handleEditOperation = (operation: Operation) => {
+    setEditingOperation(operation);
+    setName(operation.name);
+    setCode(operation.code || "");
+    setDefaultPrice(operation.default_price.toString());
+    setOpen(true);
+  };
+
+  const resetForm = () => {
+    setName("");
+    setCode("");
+    setDefaultPrice("");
+    setEditingOperation(null);
   };
 
   if (loading || isLoading) {
@@ -118,7 +178,10 @@ const Operations = () => {
             <h1 className="text-3xl font-bold">Operatsiyalar</h1>
             <p className="text-muted-foreground">Tikuv operatsiyalarini boshqarish</p>
           </div>
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={open} onOpenChange={(isOpen) => {
+            setOpen(isOpen);
+            if (!isOpen) resetForm();
+          }}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
@@ -127,12 +190,12 @@ const Operations = () => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Yangi operatsiya yaratish</DialogTitle>
+                <DialogTitle>{editingOperation ? "Operatsiyani tahrirlash" : "Yangi operatsiya yaratish"}</DialogTitle>
                 <DialogDescription>
-                  Yangi tikuv operatsiyasi qo'shing
+                  {editingOperation ? "Operatsiya ma'lumotlarini o'zgartiring" : "Yangi tikuv operatsiyasi qo'shing"}
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleCreateOperation} className="space-y-4">
+              <form onSubmit={editingOperation ? handleUpdateOperation : handleCreateOperation} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Operatsiya nomi *</Label>
                   <Input
@@ -164,7 +227,7 @@ const Operations = () => {
                   />
                 </div>
                 <Button type="submit" className="w-full">
-                  Yaratish
+                  {editingOperation ? "Yangilash" : "Yaratish"}
                 </Button>
               </form>
             </DialogContent>
@@ -196,6 +259,7 @@ const Operations = () => {
                     <TableHead>Nomi</TableHead>
                     <TableHead>Standart narx</TableHead>
                     <TableHead>Birlik</TableHead>
+                    <TableHead className="w-[100px]">Amallar</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -207,6 +271,26 @@ const Operations = () => {
                       <TableCell className="font-medium">{operation.name}</TableCell>
                       <TableCell>{operation.default_price.toLocaleString()} so'm</TableCell>
                       <TableCell>{operation.unit}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleEditOperation(operation)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive"
+                            onClick={() => handleDeleteOperation(operation.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

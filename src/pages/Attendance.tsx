@@ -5,11 +5,13 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Clock, LogIn, LogOut } from "lucide-react";
+import { Clock, LogIn, LogOut, Plus, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -25,6 +27,7 @@ interface AttendanceRecord {
   date: string;
   time_in?: string;
   time_out?: string;
+  status?: string;
   profiles?: { full_name: string };
 }
 
@@ -39,6 +42,14 @@ const Attendance = () => {
   const [selectedSeamstress, setSelectedSeamstress] = useState<string>("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [isMarkDialogOpen, setIsMarkDialogOpen] = useState(false);
+  const [markDate, setMarkDate] = useState(new Date().toISOString().split('T')[0]);
+  const [markSeamstress, setMarkSeamstress] = useState("");
+  const [markStatus, setMarkStatus] = useState("present");
+  const [markTimeIn, setMarkTimeIn] = useState("");
+  const [markTimeOut, setMarkTimeOut] = useState("");
+  const [editingRecord, setEditingRecord] = useState<AttendanceRecord | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -184,6 +195,173 @@ const Attendance = () => {
     return `${hours}s ${minutes}d`;
   };
 
+  const handleMarkAttendance = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!markSeamstress || !markDate) {
+      toast.error("Ishchi va sanani tanlang");
+      return;
+    }
+
+    try {
+      const attendanceData: any = {
+        user_id: markSeamstress,
+        date: markDate,
+        status: markStatus,
+      };
+
+      if (markStatus === 'present') {
+        if (markTimeIn) {
+          const [hours, minutes] = markTimeIn.split(':');
+          const date = new Date(markDate);
+          date.setHours(parseInt(hours), parseInt(minutes), 0);
+          attendanceData.time_in = date.toISOString();
+        }
+        if (markTimeOut) {
+          const [hours, minutes] = markTimeOut.split(':');
+          const date = new Date(markDate);
+          date.setHours(parseInt(hours), parseInt(minutes), 0);
+          attendanceData.time_out = date.toISOString();
+        }
+      }
+
+      // Check if record exists
+      const { data: existing } = await supabase
+        .from('attendance')
+        .select('id')
+        .eq('user_id', markSeamstress)
+        .eq('date', markDate)
+        .maybeSingle();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('attendance')
+          .update(attendanceData)
+          .eq('id', existing.id);
+        if (error) throw error;
+        toast.success("Davomat yangilandi");
+      } else {
+        const { error } = await supabase
+          .from('attendance')
+          .insert(attendanceData);
+        if (error) throw error;
+        toast.success("Davomat belgilandi");
+      }
+
+      setIsMarkDialogOpen(false);
+      setMarkDate(new Date().toISOString().split('T')[0]);
+      setMarkSeamstress("");
+      setMarkStatus("present");
+      setMarkTimeIn("");
+      setMarkTimeOut("");
+      fetchAttendance();
+    } catch (error: any) {
+      console.error('Error marking attendance:', error);
+      toast.error("Davomat belgilashda xatolik");
+    }
+  };
+
+  const getStatusBadge = (record: AttendanceRecord) => {
+    if (record.status === 'absent') {
+      return <Badge variant="destructive">Kelmagan</Badge>;
+    }
+    if (record.status === 'not_written') {
+      return <Badge variant="secondary">Yozilmagan</Badge>;
+    }
+    if (record.time_in) {
+      return <Badge variant="default">Kelgan</Badge>;
+    }
+    return <Badge variant="outline">—</Badge>;
+  };
+
+  const handleEditRecord = (record: AttendanceRecord) => {
+    setEditingRecord(record);
+    setMarkSeamstress(record.user_id);
+    setMarkDate(record.date);
+    setMarkStatus(record.status || (record.time_in ? 'present' : 'not_written'));
+    
+    if (record.time_in) {
+      const date = new Date(record.time_in);
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      setMarkTimeIn(`${hours}:${minutes}`);
+    } else {
+      setMarkTimeIn("");
+    }
+    
+    if (record.time_out) {
+      const date = new Date(record.time_out);
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      setMarkTimeOut(`${hours}:${minutes}`);
+    } else {
+      setMarkTimeOut("");
+    }
+    
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateAttendance = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRecord) return;
+
+    try {
+      const attendanceData: any = {
+        status: markStatus,
+      };
+
+      if (markStatus === 'present') {
+        if (markTimeIn) {
+          const [hours, minutes] = markTimeIn.split(':');
+          const date = new Date(markDate);
+          date.setHours(parseInt(hours), parseInt(minutes), 0);
+          attendanceData.time_in = date.toISOString();
+        } else {
+          attendanceData.time_in = null;
+        }
+        if (markTimeOut) {
+          const [hours, minutes] = markTimeOut.split(':');
+          const date = new Date(markDate);
+          date.setHours(parseInt(hours), parseInt(minutes), 0);
+          attendanceData.time_out = date.toISOString();
+        } else {
+          attendanceData.time_out = null;
+        }
+      } else {
+        attendanceData.time_in = null;
+        attendanceData.time_out = null;
+      }
+
+      const { error } = await supabase
+        .from('attendance')
+        .update(attendanceData)
+        .eq('id', editingRecord.id);
+
+      if (error) throw error;
+
+      toast.success("Davomat yangilandi");
+      setIsEditDialogOpen(false);
+      setEditingRecord(null);
+      setMarkDate(new Date().toISOString().split('T')[0]);
+      setMarkSeamstress("");
+      setMarkStatus("present");
+      setMarkTimeIn("");
+      setMarkTimeOut("");
+      fetchAttendance();
+    } catch (error: any) {
+      console.error('Error updating attendance:', error);
+      toast.error("Davomat yangilashda xatolik");
+    }
+  };
+
+  const resetEditForm = () => {
+    setEditingRecord(null);
+    setMarkDate(new Date().toISOString().split('T')[0]);
+    setMarkSeamstress("");
+    setMarkStatus("present");
+    setMarkTimeIn("");
+    setMarkTimeOut("");
+  };
+
   if (loading || isLoading) {
     return (
       <Layout>
@@ -251,7 +429,158 @@ const Attendance = () => {
         <Card>
           <CardHeader>
             <div className="flex flex-col gap-4">
-              <CardTitle>Davomat tarixi</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Davomat tarixi</CardTitle>
+                {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
+                  <Dialog open={isMarkDialogOpen} onOpenChange={setIsMarkDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Davomat belgilash
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Davomat belgilash</DialogTitle>
+                        <DialogDescription>
+                          Ishchi uchun davomat belgilang
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleMarkAttendance} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label>Ishchi *</Label>
+                          <Select value={markSeamstress} onValueChange={setMarkSeamstress} required>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Tanlang" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {seamstresses.map((s) => (
+                                <SelectItem key={s.id} value={s.id}>
+                                  {s.full_name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Sana *</Label>
+                          <Input
+                            type="date"
+                            value={markDate}
+                            onChange={(e) => setMarkDate(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Holat *</Label>
+                          <Select value={markStatus} onValueChange={setMarkStatus} required>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="present">Kelgan</SelectItem>
+                              <SelectItem value="absent">Kelmagan</SelectItem>
+                              <SelectItem value="not_written">Yozilmagan</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {markStatus === 'present' && (
+                          <>
+                            <div className="space-y-2">
+                              <Label>Kelgan vaqt</Label>
+                              <Input
+                                type="time"
+                                value={markTimeIn}
+                                onChange={(e) => setMarkTimeIn(e.target.value)}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Ketgan vaqt</Label>
+                              <Input
+                                type="time"
+                                value={markTimeOut}
+                                onChange={(e) => setMarkTimeOut(e.target.value)}
+                              />
+                            </div>
+                          </>
+                        )}
+                        <Button type="submit" className="w-full">
+                          Saqlash
+                        </Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
+              {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
+                <Dialog open={isEditDialogOpen} onOpenChange={(open) => {
+                  setIsEditDialogOpen(open);
+                  if (!open) resetEditForm();
+                }}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Davomatni tahrirlash</DialogTitle>
+                      <DialogDescription>
+                        Davomat ma'lumotlarini o'zgartiring
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleUpdateAttendance} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Ishchi</Label>
+                        <Input
+                          value={editingRecord?.profiles?.full_name || ''}
+                          disabled
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Sana</Label>
+                        <Input
+                          type="date"
+                          value={markDate}
+                          onChange={(e) => setMarkDate(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Holat *</Label>
+                        <Select value={markStatus} onValueChange={setMarkStatus} required>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="present">Kelgan</SelectItem>
+                            <SelectItem value="absent">Kelmagan</SelectItem>
+                            <SelectItem value="not_written">Yozilmagan</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {markStatus === 'present' && (
+                        <>
+                          <div className="space-y-2">
+                            <Label>Kelgan vaqt</Label>
+                            <Input
+                              type="time"
+                              value={markTimeIn}
+                              onChange={(e) => setMarkTimeIn(e.target.value)}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Ketgan vaqt</Label>
+                            <Input
+                              type="time"
+                              value={markTimeOut}
+                              onChange={(e) => setMarkTimeOut(e.target.value)}
+                            />
+                          </div>
+                        </>
+                      )}
+                      <Button type="submit" className="w-full">
+                        Yangilash
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              )}
               {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
                 <div className="flex gap-2 flex-wrap">
                   <div className="flex items-center gap-2">
@@ -318,9 +647,13 @@ const Attendance = () => {
                       <TableHead>Ism</TableHead>
                     )}
                     <TableHead>Sana</TableHead>
+                    <TableHead>Holat</TableHead>
                     <TableHead>Kelgan</TableHead>
                     <TableHead>Ketgan</TableHead>
                     <TableHead>Davomiyligi</TableHead>
+                    {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
+                      <TableHead>Amallar</TableHead>
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -334,11 +667,24 @@ const Attendance = () => {
                       <TableCell>
                         {new Date(record.date).toLocaleDateString('uz-UZ')}
                       </TableCell>
+                      <TableCell>{getStatusBadge(record)}</TableCell>
                       <TableCell>{formatTime(record.time_in)}</TableCell>
                       <TableCell>{formatTime(record.time_out)}</TableCell>
                       <TableCell>
                         {calculateDuration(record.time_in, record.time_out)}
                       </TableCell>
+                      {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleEditRecord(record)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>

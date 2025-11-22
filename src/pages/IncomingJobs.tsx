@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface IncomingJob {
   id: string;
@@ -62,7 +61,7 @@ const IncomingJobs = () => {
         .order('date', { ascending: false })
         .order('created_at', { ascending: false });
       if (error) throw error;
-      setJobs(data as any || []);
+      setJobs(data || []);
     } catch (error) {
       toast.error("Ma'lumotlarni yuklashda xatolik");
     } finally {
@@ -170,10 +169,10 @@ const IncomingJobs = () => {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Kelgan ishlar</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">Ishxonaga kelgan ishlar ro'yxati</p>
+            <h1 className="text-3xl font-bold">Kelgan ishlar</h1>
+            <p className="text-muted-foreground">Ishxonaga kelgan ishlar ro'yxati</p>
           </div>
           <Dialog open={open} onOpenChange={(isOpen) => { setOpen(isOpen); if (!isOpen) resetForm(); }}>
             <DialogTrigger asChild>
@@ -182,78 +181,72 @@ const IncomingJobs = () => {
                 Yangi ish
               </Button>
             </DialogTrigger>
-            <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-hidden flex flex-col gap-0">
-              <DialogHeader className="flex-shrink-0">
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
                 <DialogTitle>{editingJob ? "Tahrirlash" : "Yangi kelgan ish"}</DialogTitle>
                 <DialogDescription>
                   Ishxonaga kelgan ish haqida ma'lumot kiriting
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-                <ScrollArea className="flex-1 px-1">
-                  <div className="space-y-4 pr-3 pb-2">
-                    <div className="space-y-2">
-                      <Label>Ish nomi *</Label>
-                      <Input
-                        value={jobName}
-                        onChange={(e) => setJobName(e.target.value)}
-                        placeholder="Masalan: Ko'ylak"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Soni *</Label>
-                      <Input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        placeholder="0"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Sana *</Label>
-                      <Input
-                        type="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Yaroqsiz kiyimlar soni</Label>
-                      <Input
-                        type="number"
-                        value={defectiveItems}
-                        onChange={(e) => setDefectiveItems(e.target.value)}
-                        placeholder="0"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Ortiqcha ish</Label>
-                      <Input
-                        type="number"
-                        value={extraWork}
-                        onChange={(e) => setExtraWork(e.target.value)}
-                        placeholder="0"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Izoh</Label>
-                      <Textarea
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder="Qo'shimcha ma'lumot..."
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                </ScrollArea>
-                <div className="flex-shrink-0 pt-4 border-t mt-2">
-                  <Button type="submit" className="w-full">
-                    {editingJob ? "Yangilash" : "Saqlash"}
-                  </Button>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Ish nomi *</Label>
+                  <Input
+                    value={jobName}
+                    onChange={(e) => setJobName(e.target.value)}
+                    placeholder="Masalan: Ko'ylak"
+                    required
+                  />
                 </div>
+                <div className="space-y-2">
+                  <Label>Soni *</Label>
+                  <Input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    placeholder="0"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Sana *</Label>
+                  <Input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Yaroqsiz kiyimlar soni</Label>
+                  <Input
+                    type="number"
+                    value={defectiveItems}
+                    onChange={(e) => setDefectiveItems(e.target.value)}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Ortiqcha ish</Label>
+                  <Input
+                    type="number"
+                    value={extraWork}
+                    onChange={(e) => setExtraWork(e.target.value)}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Izoh</Label>
+                  <Textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Qo'shimcha ma'lumot..."
+                    rows={3}
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  {editingJob ? "Yangilash" : "Saqlash"}
+                </Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -263,68 +256,66 @@ const IncomingJobs = () => {
           <CardHeader>
             <CardTitle>Barcha kelgan ishlar</CardTitle>
           </CardHeader>
-          <CardContent className="p-0 sm:p-6">
+          <CardContent>
             {jobs.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-lg mb-2">Ishlar yo'q</p>
                 <p className="text-muted-foreground">Yangi ish qo'shish uchun yuqoridagi tugmani bosing</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="whitespace-nowrap">Sana</TableHead>
-                      <TableHead className="whitespace-nowrap">Ish nomi</TableHead>
-                      <TableHead className="whitespace-nowrap">Kelgan</TableHead>
-                      <TableHead className="whitespace-nowrap">Ketgan</TableHead>
-                      <TableHead className="whitespace-nowrap">Qolgan</TableHead>
-                      <TableHead className="whitespace-nowrap">Yaroqsiz</TableHead>
-                      <TableHead className="whitespace-nowrap">Ortiqcha</TableHead>
-                      <TableHead className="whitespace-nowrap">Holat</TableHead>
-                      <TableHead className="whitespace-nowrap text-right">Amallar</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {jobs.map((job) => {
-                      const totalSent = getTotalSent(job);
-                      const remaining = job.quantity - totalSent;
-                      return (
-                        <TableRow key={job.id}>
-                          <TableCell className="whitespace-nowrap">{new Date(job.date).toLocaleDateString('uz-UZ')}</TableCell>
-                          <TableCell className="font-medium whitespace-nowrap">{job.job_name}</TableCell>
-                          <TableCell className="whitespace-nowrap">{job.quantity}</TableCell>
-                          <TableCell className="whitespace-nowrap">{totalSent}</TableCell>
-                          <TableCell className="whitespace-nowrap">{remaining}</TableCell>
-                          <TableCell className="whitespace-nowrap">{job.defective_items || 0}</TableCell>
-                          <TableCell className="whitespace-nowrap">{job.extra_work || 0}</TableCell>
-                          <TableCell className="whitespace-nowrap">{getStatus(job)}</TableCell>
-                          <TableCell className="text-right whitespace-nowrap">
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => handleEdit(job)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-destructive"
-                                onClick={() => handleDelete(job.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Sana</TableHead>
+                    <TableHead>Ish nomi</TableHead>
+                    <TableHead>Kelgan</TableHead>
+                    <TableHead>Ketgan</TableHead>
+                    <TableHead>Qolgan</TableHead>
+                    <TableHead>Yaroqsiz</TableHead>
+                    <TableHead>Ortiqcha</TableHead>
+                    <TableHead>Holat</TableHead>
+                    <TableHead className="text-right">Amallar</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {jobs.map((job) => {
+                    const totalSent = getTotalSent(job);
+                    const remaining = job.quantity - totalSent;
+                    return (
+                      <TableRow key={job.id}>
+                        <TableCell>{new Date(job.date).toLocaleDateString('uz-UZ')}</TableCell>
+                        <TableCell className="font-medium">{job.job_name}</TableCell>
+                        <TableCell>{job.quantity}</TableCell>
+                        <TableCell>{totalSent}</TableCell>
+                        <TableCell>{remaining}</TableCell>
+                        <TableCell>{job.defective_items || 0}</TableCell>
+                        <TableCell>{job.extra_work || 0}</TableCell>
+                        <TableCell>{getStatus(job)}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleEdit(job)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-destructive"
+                              onClick={() => handleDelete(job.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
             )}
           </CardContent>
         </Card>

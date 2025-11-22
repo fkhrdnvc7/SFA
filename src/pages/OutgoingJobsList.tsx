@@ -45,7 +45,7 @@ const OutgoingJobsList = () => {
         .order('date', { ascending: false })
         .order('created_at', { ascending: false });
       if (error) throw error;
-      setJobs(data as any || []);
+      setJobs(data || []);
     } catch (error) {
       console.error('Error fetching jobs:', error);
     } finally {
