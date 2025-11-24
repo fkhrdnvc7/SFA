@@ -177,6 +177,8 @@ CREATE TABLE IF NOT EXISTS public.incoming_jobs (
   quantity INTEGER NOT NULL DEFAULT 0,
   defective_items INTEGER DEFAULT 0,
   extra_work INTEGER DEFAULT 0,
+  client_price_per_unit NUMERIC(12, 2) DEFAULT 0,
+  worker_cost_per_unit NUMERIC(12, 2) DEFAULT 0,
   notes TEXT,
   date DATE NOT NULL DEFAULT CURRENT_DATE,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),

@@ -176,6 +176,48 @@ export type Database = {
           },
         ]
       }
+      incoming_jobs: {
+        Row: {
+          client_price_per_unit: number | null
+          created_at: string
+          created_by: string
+          date: string
+          defective_items: number | null
+          extra_work: number | null
+          id: string
+          job_name: string
+          notes: string | null
+          quantity: number
+          worker_cost_per_unit: number | null
+        }
+        Insert: {
+          client_price_per_unit?: number | null
+          created_at?: string
+          created_by: string
+          date?: string
+          defective_items?: number | null
+          extra_work?: number | null
+          id?: string
+          job_name: string
+          notes?: string | null
+          quantity?: number
+          worker_cost_per_unit?: number | null
+        }
+        Update: {
+          client_price_per_unit?: number | null
+          created_at?: string
+          created_by?: string
+          date?: string
+          defective_items?: number | null
+          extra_work?: number | null
+          id?: string
+          job_name?: string
+          notes?: string | null
+          quantity?: number
+          worker_cost_per_unit?: number | null
+        }
+        Relationships: []
+      }
       jobs: {
         Row: {
           created_at: string
@@ -243,6 +285,44 @@ export type Database = {
           unit?: string | null
         }
         Relationships: []
+      }
+      outgoing_jobs: {
+        Row: {
+          created_at: string
+          created_by: string
+          date: string
+          id: string
+          incoming_job_id: string
+          notes: string | null
+          quantity_sent: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          date?: string
+          id?: string
+          incoming_job_id: string
+          notes?: string | null
+          quantity_sent?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          date?: string
+          id?: string
+          incoming_job_id?: string
+          notes?: string | null
+          quantity_sent?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outgoing_jobs_incoming_job_id_fkey"
+            columns: ["incoming_job_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payroll_records: {
         Row: {

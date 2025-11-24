@@ -13,10 +13,12 @@ import {
   LogOut,
   Menu,
   PackagePlus,
-  PackageMinus
+  PackageMinus,
+  TrendingUp
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
+import logo from "@/assets/logo.svg";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const { signOut, profile } = useAuth();
@@ -29,6 +31,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     { to: "/jobs", label: "Ishlar", icon: Briefcase, roles: ['ADMIN', 'MANAGER'] },
     { to: "/incoming-jobs", label: "Kelgan ish", icon: PackagePlus, roles: ['ADMIN', 'MANAGER'] },
     { to: "/outgoing-jobs-list", label: "Ketgan ish", icon: PackageMinus, roles: ['ADMIN', 'MANAGER'] },
+    { to: "/revenue", label: "Daromad", icon: TrendingUp, roles: ['ADMIN', 'MANAGER'] },
     { to: "/operations", label: "Operatsiyalar", icon: Scissors, roles: ['ADMIN', 'MANAGER'] },
     { to: "/attendance", label: "Davomat", icon: Clock },
     { to: "/my-earnings", label: "Daromadlarim", icon: DollarSign, roles: ['SEAMSTRESS'] },
@@ -70,7 +73,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       {/* Mobile Header */}
       <header className="lg:hidden border-b bg-card sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
-          <h1 className="text-xl font-bold">SFA Tailoring</h1>
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="SFA Tailoring logo" className="h-7 w-7" />
+            <h1 className="text-xl font-bold">SFA Tailoring</h1>
+          </div>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -101,7 +107,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         {/* Desktop Sidebar */}
         <aside className="hidden lg:block w-64 border-r bg-card h-screen sticky top-0">
           <div className="p-6">
-            <h1 className="text-2xl font-bold mb-8">SFA Tailoring</h1>
+            <div className="flex items-center gap-3 mb-8">
+              <img src={logo} alt="SFA Tailoring logo" className="h-9 w-9" />
+              <h1 className="text-2xl font-bold">SFA Tailoring</h1>
+            </div>
             <nav className="space-y-2">
               <NavItems />
             </nav>

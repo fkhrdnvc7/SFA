@@ -21,6 +21,7 @@ import IncomingJobs from "./pages/IncomingJobs";
 import OutgoingJobs from "./pages/OutgoingJobs";
 import OutgoingJobsList from "./pages/OutgoingJobsList";
 import NotFound from "./pages/NotFound";
+import Revenue from "./pages/Revenue";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/users" element={<Users />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/payroll" element={<Payroll />} />
+            <Route path="/revenue" element={<Revenue />} />
             <Route path="/my-earnings" element={<MyEarnings />} />
             <Route path="/incoming-jobs" element={<IncomingJobs />} />
             <Route path="/outgoing-jobs-list" element={<OutgoingJobsList />} />
