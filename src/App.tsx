@@ -22,6 +22,9 @@ import OutgoingJobs from "./pages/OutgoingJobs";
 import OutgoingJobsList from "./pages/OutgoingJobsList";
 import NotFound from "./pages/NotFound";
 import Revenue from "./pages/Revenue";
+import Tasks from "./pages/Tasks";
+import MyTasks from "./pages/MyTasks";
+import Expenses from "./pages/Expenses";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +49,9 @@ const App = () => (
             <Route path="/reports" element={<Reports />} />
             <Route path="/payroll" element={<Payroll />} />
             <Route path="/revenue" element={<Revenue />} />
+            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/my-tasks" element={<MyTasks />} />
             <Route path="/my-earnings" element={<MyEarnings />} />
             <Route path="/incoming-jobs" element={<IncomingJobs />} />
             <Route path="/outgoing-jobs-list" element={<OutgoingJobsList />} />

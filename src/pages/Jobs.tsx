@@ -109,6 +109,24 @@ const Jobs = () => {
     }
   };
 
+  const handleToggleStatus = async (jobId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'ochiq' ? 'yopiq' : 'ochiq';
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .update({ status: newStatus })
+        .eq('id', jobId);
+
+      if (error) throw error;
+
+      toast.success(`Ish ${newStatus === 'ochiq' ? 'ochildi' : 'yopildi'}`);
+      fetchJobs();
+    } catch (error: any) {
+      console.error('Error updating job status:', error);
+      toast.error("Statusni yangilashda xatolik");
+    }
+  };
+
   const handleDeleteJob = async (jobId: string) => {
     if (!confirm("Ishni o'chirishni tasdiqlaysizmi?")) return;
 
@@ -214,9 +232,16 @@ const Jobs = () => {
                       {job.job_name}
                     </CardTitle>
                     <div className="flex items-center gap-2">
-                      <Badge variant={job.status === 'ochiq' ? 'default' : 'secondary'}>
-                        {job.status === 'ochiq' ? 'Ochiq' : 'Yopiq'}
-                      </Badge>
+                      <Button
+                        variant={job.status === 'ochiq' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleStatus(job.id, job.status);
+                        }}
+                      >
+                        {job.status === 'ochiq' ? 'Yopiq qilish' : 'Ochiq qilish'}
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"

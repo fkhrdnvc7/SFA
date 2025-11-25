@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface IncomingJob {
   id: string;
@@ -263,59 +264,61 @@ const IncomingJobs = () => {
                 <p className="text-muted-foreground">Yangi ish qo'shish uchun yuqoridagi tugmani bosing</p>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Sana</TableHead>
-                    <TableHead>Ish nomi</TableHead>
-                    <TableHead>Kelgan</TableHead>
-                    <TableHead>Ketgan</TableHead>
-                    <TableHead>Qolgan</TableHead>
-                    <TableHead>Yaroqsiz</TableHead>
-                    <TableHead>Ortiqcha</TableHead>
-                    <TableHead>Holat</TableHead>
-                    <TableHead className="text-right">Amallar</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {jobs.map((job) => {
-                    const totalSent = getTotalSent(job);
-                    const remaining = job.quantity - totalSent;
-                    return (
-                      <TableRow key={job.id}>
-                        <TableCell>{new Date(job.date).toLocaleDateString('uz-UZ')}</TableCell>
-                        <TableCell className="font-medium">{job.job_name}</TableCell>
-                        <TableCell>{job.quantity}</TableCell>
-                        <TableCell>{totalSent}</TableCell>
-                        <TableCell>{remaining}</TableCell>
-                        <TableCell>{job.defective_items || 0}</TableCell>
-                        <TableCell>{job.extra_work || 0}</TableCell>
-                        <TableCell>{getStatus(job)}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleEdit(job)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-destructive"
-                              onClick={() => handleDelete(job.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+              <ScrollArea className="h-[600px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Sana</TableHead>
+                      <TableHead>Ish nomi</TableHead>
+                      <TableHead>Kelgan</TableHead>
+                      <TableHead>Ketgan</TableHead>
+                      <TableHead>Qolgan</TableHead>
+                      <TableHead>Yaroqsiz</TableHead>
+                      <TableHead>Ortiqcha</TableHead>
+                      <TableHead>Holat</TableHead>
+                      <TableHead className="text-right">Amallar</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {jobs.map((job) => {
+                      const totalSent = getTotalSent(job);
+                      const remaining = job.quantity - totalSent;
+                      return (
+                        <TableRow key={job.id}>
+                          <TableCell>{new Date(job.date).toLocaleDateString('uz-UZ')}</TableCell>
+                          <TableCell className="font-medium">{job.job_name}</TableCell>
+                          <TableCell>{job.quantity}</TableCell>
+                          <TableCell>{totalSent}</TableCell>
+                          <TableCell>{remaining}</TableCell>
+                          <TableCell>{job.defective_items || 0}</TableCell>
+                          <TableCell>{job.extra_work || 0}</TableCell>
+                          <TableCell>{getStatus(job)}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => handleEdit(job)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive"
+                                onClick={() => handleDelete(job.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
             )}
           </CardContent>
         </Card>

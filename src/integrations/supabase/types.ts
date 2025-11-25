@@ -119,8 +119,10 @@ export type Database = {
           color: string | null
           created_at: string
           id: string
+          item_date: string | null
           job_id: string
           operation_id: string
+          order_number: number | null
           quantity: number
           seamstress_id: string | null
           size: string | null
@@ -132,8 +134,10 @@ export type Database = {
           color?: string | null
           created_at?: string
           id?: string
+          item_date?: string | null
           job_id: string
           operation_id: string
+          order_number?: number | null
           quantity?: number
           seamstress_id?: string | null
           size?: string | null
@@ -145,8 +149,10 @@ export type Database = {
           color?: string | null
           created_at?: string
           id?: string
+          item_date?: string | null
           job_id?: string
           operation_id?: string
+          order_number?: number | null
           quantity?: number
           seamstress_id?: string | null
           size?: string | null
@@ -170,6 +176,95 @@ export type Database = {
           {
             foreignKeyName: "job_items_seamstress_id_fkey"
             columns: ["seamstress_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_tasks: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          notes: string | null
+          seamstress_id: string
+          status: Database["public"]["Enums"]["task_status"]
+          task_date: string
+          task_description: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          notes?: string | null
+          seamstress_id: string
+          status?: Database["public"]["Enums"]["task_status"]
+          task_date?: string
+          task_description: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          notes?: string | null
+          seamstress_id?: string
+          status?: Database["public"]["Enums"]["task_status"]
+          task_date?: string
+          task_description?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_tasks_seamstress_id_fkey"
+            columns: ["seamstress_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_tasks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expenses: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          description: string | null
+          expense_date: string
+          expense_name: string
+          id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by: string
+          description?: string | null
+          expense_date?: string
+          expense_name: string
+          id?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          expense_date?: string
+          expense_name?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -472,6 +567,7 @@ export type Database = {
     Enums: {
       job_status: "ochiq" | "yopiq"
       payroll_status: "tolangan" | "tolanmagan" | "qisman"
+      task_status: "bajarilmagan" | "qisman" | "bajarilgan"
       user_role: "ADMIN" | "MANAGER" | "SEAMSTRESS"
     }
     CompositeTypes: {

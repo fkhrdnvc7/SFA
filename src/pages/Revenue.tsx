@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -182,53 +183,55 @@ const Revenue = () => {
           <CardTitle>Daromad jadvali</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Sana</TableHead>
-                <TableHead>Ish nomi</TableHead>
-                <TableHead>Kelgan soni</TableHead>
-                <TableHead>Mijoz narxi (dona)</TableHead>
-                <TableHead>Ishchi xarajati (dona)</TableHead>
-                <TableHead>Farq (dona)</TableHead>
-                <TableHead>Admin foydasi</TableHead>
-                <TableHead className="text-right">Amallar</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {jobs.map((job) => {
-                const clientRate = job.client_price_per_unit || 0;
-                const workerRate = job.worker_cost_per_unit || 0;
-                const unitProfit = clientRate - workerRate;
-                const totalProfit = unitProfit * job.quantity;
+          <ScrollArea className="h-[600px]">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Sana</TableHead>
+                  <TableHead>Ish nomi</TableHead>
+                  <TableHead>Kelgan soni</TableHead>
+                  <TableHead>Mijoz narxi (dona)</TableHead>
+                  <TableHead>Ishchi xarajati (dona)</TableHead>
+                  <TableHead>Farq (dona)</TableHead>
+                  <TableHead>Admin foydasi</TableHead>
+                  <TableHead className="text-right">Amallar</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {jobs.map((job) => {
+                  const clientRate = job.client_price_per_unit || 0;
+                  const workerRate = job.worker_cost_per_unit || 0;
+                  const unitProfit = clientRate - workerRate;
+                  const totalProfit = unitProfit * job.quantity;
 
-                return (
-                  <TableRow key={job.id}>
-                    <TableCell>
-                      {new Date(job.date).toLocaleDateString("uz-UZ")}
-                    </TableCell>
-                    <TableCell className="font-medium">{job.job_name}</TableCell>
-                    <TableCell>{job.quantity}</TableCell>
-                    <TableCell>{formatCurrency(clientRate)}</TableCell>
-                    <TableCell>{formatCurrency(workerRate)}</TableCell>
-                    <TableCell>{formatCurrency(unitProfit)}</TableCell>
-                    <TableCell className="font-semibold">
-                      {formatCurrency(totalProfit)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditClick(job)}
-                      >
-                        Narxni sozlash
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                  return (
+                    <TableRow key={job.id}>
+                      <TableCell>
+                        {new Date(job.date).toLocaleDateString("uz-UZ")}
+                      </TableCell>
+                      <TableCell className="font-medium">{job.job_name}</TableCell>
+                      <TableCell>{job.quantity}</TableCell>
+                      <TableCell>{formatCurrency(clientRate)}</TableCell>
+                      <TableCell>{formatCurrency(workerRate)}</TableCell>
+                      <TableCell>{formatCurrency(unitProfit)}</TableCell>
+                      <TableCell className="font-semibold">
+                        {formatCurrency(totalProfit)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditClick(job)}
+                        >
+                          Narxni sozlash
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </ScrollArea>
         </CardContent>
       </Card>
     );

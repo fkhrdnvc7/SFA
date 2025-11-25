@@ -14,9 +14,12 @@ import {
   Menu,
   PackagePlus,
   PackageMinus,
-  TrendingUp
+  TrendingUp,
+  ClipboardList,
+  Receipt
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
 import logo from "@/assets/logo.svg";
 
@@ -29,9 +32,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const navigationItems = [
     { to: "/dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
     { to: "/jobs", label: "Ishlar", icon: Briefcase, roles: ['ADMIN', 'MANAGER'] },
+    { to: "/tasks", label: "Vazifa berish", icon: ClipboardList, roles: ['ADMIN', 'MANAGER'] },
+    { to: "/my-tasks", label: "Vazifalarim", icon: ClipboardList, roles: ['SEAMSTRESS'] },
     { to: "/incoming-jobs", label: "Kelgan ish", icon: PackagePlus, roles: ['ADMIN', 'MANAGER'] },
     { to: "/outgoing-jobs-list", label: "Ketgan ish", icon: PackageMinus, roles: ['ADMIN', 'MANAGER'] },
     { to: "/revenue", label: "Daromad", icon: TrendingUp, roles: ['ADMIN', 'MANAGER'] },
+    { to: "/expenses", label: "Xarajatlar", icon: Receipt, roles: ['ADMIN', 'MANAGER'] },
     { to: "/operations", label: "Operatsiyalar", icon: Scissors, roles: ['ADMIN', 'MANAGER'] },
     { to: "/attendance", label: "Davomat", icon: Clock },
     { to: "/my-earnings", label: "Daromadlarim", icon: DollarSign, roles: ['SEAMSTRESS'] },
@@ -105,17 +111,21 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
       <div className="flex">
         {/* Desktop Sidebar */}
-        <aside className="hidden lg:block w-64 border-r bg-card h-screen sticky top-0">
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-8">
+        <aside className="hidden lg:block w-64 border-r bg-card h-screen sticky top-0 flex flex-col">
+          <div className="p-6 border-b">
+            <div className="flex items-center gap-3">
               <img src={logo} alt="SFA Tailoring logo" className="h-9 w-9" />
               <h1 className="text-2xl font-bold">SFA Tailoring</h1>
             </div>
+          </div>
+          <ScrollArea className="flex-1">
+            <div className="p-6 pt-4">
             <nav className="space-y-2">
               <NavItems />
             </nav>
           </div>
-          <div className="absolute bottom-0 w-full p-6">
+          </ScrollArea>
+          <div className="p-6 border-t mt-auto">
             <div className="mb-4 p-3 bg-accent rounded-lg">
               <p className="text-sm font-medium">{profile?.full_name}</p>
               <p className="text-xs text-muted-foreground">{profile?.role}</p>

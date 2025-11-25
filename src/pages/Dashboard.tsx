@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Briefcase, DollarSign, Clock, TrendingUp } from "lucide-react";
+import { Briefcase, DollarSign, Clock, TrendingUp, ClipboardList, Receipt } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -149,7 +149,9 @@ const Dashboard = () => {
             <CardTitle>Tezkor amallar</CardTitle>
             <CardDescription>Tez-tez ishlatiladigan funksiyalar</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent>
+            <div className="max-h-[400px] overflow-y-auto pr-2">
+              <div className="space-y-2">
             {profile?.role === 'SEAMSTRESS' && (
               <div className="flex gap-2">
                 <button
@@ -159,10 +161,24 @@ const Dashboard = () => {
                   <Clock className="h-6 w-6 mb-2 mx-auto" />
                   <p className="font-medium">Davomatga belgilash</p>
                 </button>
+                    <button
+                      onClick={() => navigate('/my-tasks')}
+                      className="flex-1 p-4 bg-secondary text-secondary-foreground rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      <ClipboardList className="h-6 w-6 mb-2 mx-auto" />
+                      <p className="font-medium">Vazifalarim</p>
+                    </button>
+                    <button
+                      onClick={() => navigate('/my-earnings')}
+                      className="flex-1 p-4 bg-green-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      <DollarSign className="h-6 w-6 mb-2 mx-auto" />
+                      <p className="font-medium">Daromadlarim</p>
+                    </button>
               </div>
             )}
             {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 <button
                   onClick={() => navigate('/jobs')}
                   className="p-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
@@ -170,15 +186,45 @@ const Dashboard = () => {
                   <Briefcase className="h-6 w-6 mb-2 mx-auto" />
                   <p className="font-medium">Yangi ish yaratish</p>
                 </button>
+                    <button
+                      onClick={() => navigate('/tasks')}
+                      className="p-4 bg-blue-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      <ClipboardList className="h-6 w-6 mb-2 mx-auto" />
+                      <p className="font-medium">Vazifa berish</p>
+                    </button>
+                    <button
+                      onClick={() => navigate('/expenses')}
+                      className="p-4 bg-orange-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      <Receipt className="h-6 w-6 mb-2 mx-auto" />
+                      <p className="font-medium">Xarajatlar</p>
+                    </button>
+                    <button
+                      onClick={() => navigate('/incoming-jobs')}
+                      className="p-4 bg-green-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      <Briefcase className="h-6 w-6 mb-2 mx-auto" />
+                      <p className="font-medium">Kelgan ish</p>
+                    </button>
+                    <button
+                      onClick={() => navigate('/revenue')}
+                      className="p-4 bg-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      <TrendingUp className="h-6 w-6 mb-2 mx-auto" />
+                      <p className="font-medium">Daromad</p>
+                    </button>
                 <button
                   onClick={() => navigate('/reports')}
                   className="p-4 bg-secondary text-secondary-foreground rounded-lg hover:opacity-90 transition-opacity"
                 >
                   <TrendingUp className="h-6 w-6 mb-2 mx-auto" />
-                  <p className="font-medium">Hisobotlarni ko'rish</p>
+                      <p className="font-medium">Hisobotlar</p>
                 </button>
               </div>
             )}
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

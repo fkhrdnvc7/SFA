@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface JobItem {
   id: string;
@@ -208,53 +209,55 @@ const MyEarnings = () => {
             <CardTitle>Ishlar ro'yxati</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Ish nomi</TableHead>
-                  <TableHead>Operatsiya</TableHead>
-                  <TableHead>Miqdor</TableHead>
-                  <TableHead>O'lcham</TableHead>
-                  <TableHead>Rang</TableHead>
-                  <TableHead>Narx</TableHead>
-                  <TableHead>Bonus</TableHead>
-                  <TableHead className="text-right">Jami</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {jobItems.length === 0 ? (
+            <ScrollArea className="h-[600px]">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">
-                      Hali ishlar yo'q
-                    </TableCell>
+                    <TableHead>Ish nomi</TableHead>
+                    <TableHead>Operatsiya</TableHead>
+                    <TableHead>Miqdor</TableHead>
+                    <TableHead>O'lcham</TableHead>
+                    <TableHead>Rang</TableHead>
+                    <TableHead>Narx</TableHead>
+                    <TableHead>Bonus</TableHead>
+                    <TableHead className="text-right">Jami</TableHead>
                   </TableRow>
-                ) : (
-                  jobItems.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.jobs?.job_name}</TableCell>
-                      <TableCell>{item.operations?.name}</TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell>{item.size || '—'}</TableCell>
-                      <TableCell>{item.color || '—'}</TableCell>
-                      <TableCell>{formatCurrency(item.unit_price)}</TableCell>
-                      <TableCell>
-                        {item.bonus_amount ? (
-                          <div>
-                            <div>{formatCurrency(item.bonus_amount)}</div>
-                            {item.bonus_note && (
-                              <div className="text-xs text-muted-foreground">{item.bonus_note}</div>
-                            )}
-                          </div>
-                        ) : '—'}
-                      </TableCell>
-                      <TableCell className="text-right font-semibold">
-                        {formatCurrency(calculateItemEarnings(item))}
+                </TableHeader>
+                <TableBody>
+                  {jobItems.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center text-muted-foreground">
+                        Hali ishlar yo'q
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                  ) : (
+                    jobItems.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell className="font-medium">{item.jobs?.job_name}</TableCell>
+                        <TableCell>{item.operations?.name}</TableCell>
+                        <TableCell>{item.quantity}</TableCell>
+                        <TableCell>{item.size || '—'}</TableCell>
+                        <TableCell>{item.color || '—'}</TableCell>
+                        <TableCell>{formatCurrency(item.unit_price)}</TableCell>
+                        <TableCell>
+                          {item.bonus_amount ? (
+                            <div>
+                              <div>{formatCurrency(item.bonus_amount)}</div>
+                              {item.bonus_note && (
+                                <div className="text-xs text-muted-foreground">{item.bonus_note}</div>
+                              )}
+                            </div>
+                          ) : '—'}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold">
+                          {formatCurrency(calculateItemEarnings(item))}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </ScrollArea>
           </CardContent>
         </Card>
       </div>
