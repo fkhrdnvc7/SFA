@@ -29,7 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { TrendingUp, Wallet, UsersRound, Receipt } from "lucide-react";
+import { TrendingUp, Wallet, UsersRound, Receipt, Eye, EyeOff } from "lucide-react";
 
 interface RevenueJob {
   id: string;
@@ -50,6 +50,7 @@ const Revenue = () => {
   const [editingJob, setEditingJob] = useState<RevenueJob | null>(null);
   const [clientPrice, setClientPrice] = useState("");
   const [workerCost, setWorkerCost] = useState("");
+  const [showAdminProfit, setShowAdminProfit] = useState(false);
 
   const fetchJobs = useCallback(async () => {
     try {
@@ -193,7 +194,22 @@ const Revenue = () => {
                   <TableHead>Mijoz narxi (dona)</TableHead>
                   <TableHead>Ishchi xarajati (dona)</TableHead>
                   <TableHead>Farq (dona)</TableHead>
-                  <TableHead>Admin foydasi</TableHead>
+                  <TableHead>Jami ishchi xarajati</TableHead>
+                  <TableHead>
+                    <div className="flex items-center justify-between">
+                      <span>Admin foydasi</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setShowAdminProfit((prev) => !prev)}
+                        title={showAdminProfit ? "Yashirish" : "Ko'rsatish"}
+                      >
+                        {showAdminProfit ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </TableHead>
                   <TableHead className="text-right">Amallar</TableHead>
                 </TableRow>
               </TableHeader>
@@ -203,6 +219,7 @@ const Revenue = () => {
                   const workerRate = job.worker_cost_per_unit || 0;
                   const unitProfit = clientRate - workerRate;
                   const totalProfit = unitProfit * job.quantity;
+                  const totalWorkerCost = workerRate * job.quantity;
 
                   return (
                     <TableRow key={job.id}>
@@ -214,8 +231,9 @@ const Revenue = () => {
                       <TableCell>{formatCurrency(clientRate)}</TableCell>
                       <TableCell>{formatCurrency(workerRate)}</TableCell>
                       <TableCell>{formatCurrency(unitProfit)}</TableCell>
+                      <TableCell>{formatCurrency(totalWorkerCost)}</TableCell>
                       <TableCell className="font-semibold">
-                        {formatCurrency(totalProfit)}
+                        {showAdminProfit ? formatCurrency(totalProfit) : "•••••"}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
@@ -287,10 +305,24 @@ const Revenue = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Admin foydasi</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => setShowAdminProfit((prev) => !prev)}
+                  title={showAdminProfit ? "Yashirish" : "Ko'rsatish"}
+                >
+                  {showAdminProfit ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(adminProfit)}</div>
+              <div className="text-2xl font-bold">
+                {showAdminProfit ? formatCurrency(adminProfit) : "•••••"}
+              </div>
             </CardContent>
           </Card>
         </div>
