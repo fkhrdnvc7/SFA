@@ -51,6 +51,8 @@ const Revenue = () => {
   const [clientPrice, setClientPrice] = useState("");
   const [workerCost, setWorkerCost] = useState("");
   const [showAdminProfit, setShowAdminProfit] = useState(false);
+  const [visibleClientRates, setVisibleClientRates] = useState<Record<string, boolean>>({});
+  const [visibleWorkerRates, setVisibleWorkerRates] = useState<Record<string, boolean>>({});
 
   const fetchJobs = useCallback(async () => {
     try {
@@ -131,6 +133,20 @@ const Revenue = () => {
       console.error("Failed to update revenue rates:", error);
       toast.error("Narxlarni saqlashda xatolik");
     }
+  };
+
+  const toggleClientRateVisibility = (jobId: string) => {
+    setVisibleClientRates((prev) => ({
+      ...prev,
+      [jobId]: !prev[jobId],
+    }));
+  };
+
+  const toggleWorkerRateVisibility = (jobId: string) => {
+    setVisibleWorkerRates((prev) => ({
+      ...prev,
+      [jobId]: !prev[jobId],
+    }));
   };
 
   const summary = useMemo(() => {
@@ -228,8 +244,40 @@ const Revenue = () => {
                       </TableCell>
                       <TableCell className="font-medium">{job.job_name}</TableCell>
                       <TableCell>{job.quantity}</TableCell>
-                      <TableCell>{formatCurrency(clientRate)}</TableCell>
-                      <TableCell>{formatCurrency(workerRate)}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-between gap-2">
+                          <span>
+                            {visibleClientRates[job.id] ? formatCurrency(clientRate) : "•••••"}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => toggleClientRateVisibility(job.id)}
+                            title={visibleClientRates[job.id] ? "Yashirish" : "Ko'rsatish"}
+                          >
+                            {visibleClientRates[job.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-between gap-2">
+                          <span>
+                            {visibleWorkerRates[job.id] ? formatCurrency(workerRate) : "•••••"}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => toggleWorkerRateVisibility(job.id)}
+                            title={visibleWorkerRates[job.id] ? "Yashirish" : "Ko'rsatish"}
+                          >
+                            {visibleWorkerRates[job.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </TableCell>
                       <TableCell>{formatCurrency(unitProfit)}</TableCell>
                       <TableCell>{formatCurrency(totalWorkerCost)}</TableCell>
                       <TableCell className="font-semibold">
