@@ -22,6 +22,7 @@ interface Job {
   job_name: string;
   status: 'ochiq' | 'yopiq';
   created_at: string;
+  completed_at?: string | null;
   notes?: string;
 }
 
@@ -61,8 +62,6 @@ const JobDetails = () => {
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [unitPrice, setUnitPrice] = useState("");
-  const [bonusAmount, setBonusAmount] = useState("0");
-  const [bonusNote, setBonusNote] = useState("");
   
   // Filters
   const [filterSeamstress, setFilterSeamstress] = useState("all");
@@ -207,6 +206,22 @@ const JobDetails = () => {
     setSizes(data || []);
   };
 
+  const getDurationText = () => {
+    if (!job?.completed_at) return null;
+    const start = new Date(job.created_at);
+    const end = new Date(job.completed_at);
+    const diffMs = end.getTime() - start.getTime();
+    if (diffMs <= 0) return "0 kun";
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const parts = [];
+    if (days > 0) parts.push(`${days} kun`);
+    if (hours > 0) parts.push(`${hours} soat`);
+    if (minutes > 0 && days === 0) parts.push(`${minutes} daqiqa`);
+    return parts.join(' ');
+  };
+
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedOperation || !unitPrice) {
@@ -222,8 +237,6 @@ const JobDetails = () => {
         size: selectedSize || null,
         quantity: parseInt(quantity),
         unit_price: parseFloat(unitPrice),
-        bonus_amount: parseFloat(bonusAmount) || 0,
-        bonus_note: bonusNote || null,
       };
       
       const { error } = await supabase.from('job_items').insert(insertData);
@@ -248,8 +261,6 @@ const JobDetails = () => {
       await supabase.from('job_items').update({
         quantity: parseInt(quantity),
         unit_price: parseFloat(unitPrice),
-        bonus_amount: parseFloat(bonusAmount) || 0,
-        bonus_note: bonusNote || null,
         color: selectedColor || null,
         size: selectedSize || null,
       }).eq('id', editingItem.id);
@@ -278,8 +289,6 @@ const JobDetails = () => {
     setEditingItem(item);
     setQuantity(item.quantity.toString());
     setUnitPrice(item.unit_price.toString());
-    setBonusAmount(item.bonus_amount?.toString() || "0");
-    setBonusNote(item.bonus_note || "");
     setSelectedColor(item.color || "");
     setSelectedSize(item.size || "");
     setOpen(true);
@@ -292,8 +301,6 @@ const JobDetails = () => {
     setSelectedSize("");
     setQuantity("1");
     setUnitPrice("");
-    setBonusAmount("0");
-    setBonusNote("");
     setEditingItem(null);
   };
 
@@ -320,6 +327,15 @@ const JobDetails = () => {
               <h1 className="text-3xl font-bold">{job.job_name}</h1>
               <Badge variant={job.status === 'ochiq' ? 'default' : 'secondary'}>{job.status === 'ochiq' ? 'Ochiq' : 'Yopiq'}</Badge>
             </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Boshlanishi: {new Date(job.created_at).toLocaleDateString('uz-UZ')}
+              {job.completed_at && (
+                <>
+                  {" • "}Tugatilgan: {new Date(job.completed_at).toLocaleDateString('uz-UZ')}
+                  {" • "}Davomiyligi: {getDurationText()}
+                </>
+              )}
+            </p>
           </div>
           {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
             <Dialog open={open} onOpenChange={(isOpen) => { setOpen(isOpen); if (!isOpen) resetForm(); }}>
@@ -376,12 +392,10 @@ const JobDetails = () => {
                       <p className="text-xs text-muted-foreground">Vergul bilan ajrating</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div><Label>Soni</Label><Input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} required /></div>
                     <div><Label>Narx</Label><Input type="number" step="0.01" value={unitPrice} onChange={(e) => setUnitPrice(e.target.value)} required /></div>
-                    <div><Label>Bonus</Label><Input type="number" step="0.01" value={bonusAmount} onChange={(e) => setBonusAmount(e.target.value)} /></div>
                   </div>
-                  <div><Label>Bonus izohi</Label><Textarea value={bonusNote} onChange={(e) => setBonusNote(e.target.value)} rows={2} /></div>
                   <Button type="submit" className="w-full">{editingItem ? "Yangilash" : "Qo'shish"}</Button>
                 </form>
               </DialogContent>

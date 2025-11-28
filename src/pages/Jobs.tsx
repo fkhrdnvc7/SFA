@@ -25,6 +25,7 @@ interface Job {
   job_name: string;
   status: 'ochiq' | 'yopiq';
   created_at: string;
+  completed_at?: string | null;
   notes?: string;
   total_estimated_amount: number;
   job_items?: { color?: string }[];
@@ -83,6 +84,22 @@ const Jobs = () => {
     return Array.from(colorsSet);
   };
 
+  const formatDuration = (job: Job) => {
+    if (job.status !== 'yopiq' || !job.completed_at) return null;
+    const start = new Date(job.created_at);
+    const end = new Date(job.completed_at);
+    const diffMs = end.getTime() - start.getTime();
+    if (diffMs <= 0) return "0 kun";
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const parts = [];
+    if (days > 0) parts.push(`${days} kun`);
+    if (hours > 0) parts.push(`${hours} soat`);
+    if (minutes > 0 && days === 0) parts.push(`${minutes} daqiqa`);
+    return parts.join(' ');
+  };
+
   const handleCreateJob = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!jobName.trim()) return;
@@ -110,11 +127,18 @@ const Jobs = () => {
   };
 
   const handleToggleStatus = async (jobId: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'ochiq' ? 'yopiq' : 'ochiq';
+    const newStatus: 'ochiq' | 'yopiq' = currentStatus === 'ochiq' ? 'yopiq' : 'ochiq';
+    const updates: any = { status: newStatus };
+    if (newStatus === 'yopiq') {
+      updates.completed_at = new Date().toISOString();
+    } else {
+      updates.completed_at = null;
+    }
+
     try {
       const { error } = await supabase
         .from('jobs')
-        .update({ status: newStatus })
+        .update(updates)
         .eq('id', jobId);
 
       if (error) throw error;
@@ -256,7 +280,12 @@ const Jobs = () => {
                     </div>
                   </div>
                   <CardDescription>
-                    {new Date(job.created_at).toLocaleDateString('uz-UZ')}
+                    Boshlanishi: {new Date(job.created_at).toLocaleDateString('uz-UZ')}
+                    {job.status === 'yopiq' && job.completed_at && (
+                      <span className="block text-xs text-green-600 mt-1">
+                        Tugatilgan: {new Date(job.completed_at).toLocaleDateString('uz-UZ')} • Davomiyligi: {formatDuration(job)}
+                      </span>
+                    )}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

@@ -58,6 +58,8 @@ interface MonthlyEarnings {
   paid_status: 'tolangan' | 'tolanmagan' | 'qisman';
   paid_amount: number;
   payroll_record_id?: string;
+  bonus_amount?: number;
+  bonus_note?: string | null;
 }
 
 interface JobItemDetail {
@@ -84,6 +86,13 @@ interface ChartData {
   value: number;
 }
 
+interface DailyWorkerStat {
+  seamstress_id: string;
+  seamstress_name: string;
+  total_items: number;
+  total_earnings: number;
+}
+
 const Payroll = () => {
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
@@ -100,11 +109,17 @@ const Payroll = () => {
   const [selectedSeamstress, setSelectedSeamstress] = useState<MonthlyEarnings | null>(null);
   const [paidAmount, setPaidAmount] = useState("");
   const [paymentNotes, setPaymentNotes] = useState("");
+  const [bonusAmountInput, setBonusAmountInput] = useState("");
+  const [bonusNoteInput, setBonusNoteInput] = useState("");
 
   // Detail dialog state
   const [detailDialog, setDetailDialog] = useState(false);
   const [selectedDetails, setSelectedDetails] = useState<JobItemDetail[]>([]);
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [dailyWorkerStats, setDailyWorkerStats] = useState<Record<string, DailyWorkerStat[]>>({});
+  const [selectedDailyDate, setSelectedDailyDate] = useState("");
+  const [dailyDates, setDailyDates] = useState<string[]>([]);
+  const [selectedGrowthSeamstress, setSelectedGrowthSeamstress] = useState("");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -187,11 +202,14 @@ const Payroll = () => {
         .from('job_items')
         .select(`
           seamstress_id,
+          job_id,
           quantity,
           unit_price,
           bonus_amount,
           created_at,
-          profiles (full_name)
+          item_date,
+          profiles (full_name),
+          jobs (job_name)
         `)
         .not('seamstress_id', 'is', null)
         .gte('created_at', startDate.toISOString())
@@ -210,32 +228,88 @@ const Payroll = () => {
 
       // Process earnings
       const earningsMap = new Map<string, MonthlyEarnings>();
+      const dailyMap = new Map<string, Map<string, DailyWorkerStat>>();
 
       jobItemsData?.forEach((item: any) => {
         const earnings = (item.quantity * item.unit_price) + (item.bonus_amount || 0);
+        const dateKey = (item.item_date || item.created_at)?.split('T')[0];
         
         const existing = earningsMap.get(item.seamstress_id);
         if (existing) {
-          existing.total_items += 1;
+          existing.total_items += item.quantity;
           existing.total_earnings += earnings;
         } else {
-          const payrollRecord = payrollData?.find(p => p.seamstress_id === item.seamstress_id);
-          
           earningsMap.set(item.seamstress_id, {
             seamstress_id: item.seamstress_id,
             seamstress_name: item.profiles?.full_name || 'Noma\'lum',
-            total_items: 1,
+            total_items: item.quantity,
             total_earnings: earnings,
-            paid_status: payrollRecord?.status || 'tolanmagan',
-            paid_amount: payrollRecord?.paid_amount || 0,
-            payroll_record_id: payrollRecord?.id,
+            paid_status: 'tolanmagan',
+            paid_amount: 0,
+            payroll_record_id: undefined,
+            bonus_amount: 0,
+            bonus_note: null,
           });
+        }
+
+        if (dateKey) {
+          if (!dailyMap.has(dateKey)) {
+            dailyMap.set(dateKey, new Map());
+          }
+          const dayMap = dailyMap.get(dateKey)!;
+          const dayEntry = dayMap.get(item.seamstress_id);
+          if (dayEntry) {
+            dayEntry.total_items += item.quantity;
+            dayEntry.total_earnings += earnings;
+          } else {
+            dayMap.set(item.seamstress_id, {
+              seamstress_id: item.seamstress_id,
+              seamstress_name: item.profiles?.full_name || 'Noma\'lum',
+              total_items: item.quantity,
+              total_earnings: earnings,
+            });
+          }
         }
       });
 
-      setMonthlyData(Array.from(earningsMap.values()).sort((a, b) => 
+      payrollData?.forEach((record) => {
+        const entry = earningsMap.get(record.seamstress_id);
+        if (entry) {
+          entry.paid_status = record.status;
+          entry.paid_amount = record.paid_amount;
+          entry.payroll_record_id = record.id;
+          entry.bonus_amount = record.bonus_amount || 0;
+          entry.bonus_note = record.bonus_note || null;
+        }
+      });
+
+      const sortedMonthly = Array.from(earningsMap.values()).sort((a, b) => 
         b.total_earnings - a.total_earnings
-      ));
+      );
+      setMonthlyData(sortedMonthly);
+
+      const dailyStatsRecord: Record<string, DailyWorkerStat[]> = {};
+      const sortedDates = Array.from(dailyMap.keys()).sort();
+      sortedDates.forEach((date) => {
+        dailyStatsRecord[date] = Array.from(dailyMap.get(date)!.values()).sort(
+          (a, b) => b.total_earnings - a.total_earnings
+        );
+      });
+      setDailyWorkerStats(dailyStatsRecord);
+      setDailyDates(sortedDates);
+      if (sortedDates.length > 0) {
+        const defaultDate = sortedDates[sortedDates.length - 1];
+        setSelectedDailyDate((prev) => (prev && dailyStatsRecord[prev]) ? prev : defaultDate);
+      } else {
+        setSelectedDailyDate("");
+      }
+
+      setSelectedGrowthSeamstress((prev) => {
+        if (prev && sortedMonthly.find((item) => item.seamstress_id === prev)) {
+          return prev;
+        }
+        return sortedMonthly[0]?.seamstress_id || "";
+      });
     } catch (error) {
       console.error('Error fetching monthly data:', error);
       toast.error("Ma'lumotlarni yuklashda xatolik");
@@ -249,12 +323,14 @@ const Payroll = () => {
 
     try {
       const amount = parseFloat(paidAmount);
+      const bonusValue = parseFloat(bonusAmountInput || "0");
       const totalEarnings = selectedSeamstress.total_earnings;
+      const totalPaid = amount + bonusValue;
       
       let status: 'tolangan' | 'tolanmagan' | 'qisman' = 'tolanmagan';
-      if (amount >= totalEarnings) {
+      if (totalPaid >= totalEarnings) {
         status = 'tolangan';
-      } else if (amount > 0) {
+      } else if (totalPaid > 0) {
         status = 'qisman';
       }
 
@@ -264,6 +340,8 @@ const Payroll = () => {
         year: parseInt(selectedYear),
         total_amount: totalEarnings,
         paid_amount: amount,
+        bonus_amount: bonusValue,
+        bonus_note: bonusNoteInput || null,
         status: status,
         payment_date: new Date().toISOString(),
         notes: paymentNotes || null,
@@ -291,6 +369,8 @@ const Payroll = () => {
       setPaymentDialog(false);
       setPaidAmount("");
       setPaymentNotes("");
+      setBonusAmountInput("");
+      setBonusNoteInput("");
       fetchMonthlyData();
     } catch (error: any) {
       console.error('Error marking payment:', error);
@@ -428,6 +508,34 @@ const Payroll = () => {
   ].filter(item => item.value > 0);
 
   const COLORS = ['#22c55e', '#94a3b8', '#ef4444'];
+  const totalPaidWithBonus = monthlyData.reduce(
+    (sum, item) => sum + item.paid_amount + (item.bonus_amount || 0),
+    0
+  );
+  const selectedDailyStats = selectedDailyDate ? dailyWorkerStats[selectedDailyDate] || [] : [];
+  const selectedDailyLabel = selectedDailyDate ? new Date(selectedDailyDate).toLocaleDateString('uz-UZ') : '';
+  const dailyChartData = selectedDailyStats.slice(0, 8).map((stat) => ({
+    name: stat.seamstress_name.split(' ')[0] || stat.seamstress_name,
+    earnings: stat.total_earnings,
+  }));
+  const seamstressGrowthOptions = monthlyData.map((item) => ({
+    value: item.seamstress_id,
+    label: item.seamstress_name,
+  }));
+  let cumulativeTotal = 0;
+  const seamstressGrowthData = selectedGrowthSeamstress
+    ? dailyDates.map((date) => {
+        const stat = dailyWorkerStats[date]?.find((entry) => entry.seamstress_id === selectedGrowthSeamstress);
+        const dailyAmount = stat?.total_earnings || 0;
+        cumulativeTotal += dailyAmount;
+        return {
+          dateLabel: new Date(date).toLocaleDateString('uz-UZ'),
+          daily: dailyAmount,
+          cumulative: cumulativeTotal,
+        };
+      }).filter((entry) => entry.daily > 0 || entry.cumulative > 0)
+    : [];
+  const formatCurrency = (value: number) => `${value.toLocaleString()} so'm`;
 
   if (loading || isLoading) {
     return (
@@ -635,15 +743,15 @@ const Payroll = () => {
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">To'langan summa</span>
+                  <span className="text-sm text-muted-foreground">To'langan summa (bonus bilan)</span>
                   <span className="text-lg font-bold text-green-500">
-                    {monthlyData.reduce((sum, item) => sum + item.paid_amount, 0).toLocaleString()} so'm
+                    {totalPaidWithBonus.toLocaleString()} so'm
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Qarz summa</span>
                   <span className="text-lg font-bold text-destructive">
-                    {monthlyData.reduce((sum, item) => sum + (item.total_earnings - item.paid_amount), 0).toLocaleString()} so'm
+                    {monthlyData.reduce((sum, item) => sum + (item.total_earnings - (item.paid_amount + (item.bonus_amount || 0))), 0).toLocaleString()} so'm
                   </span>
                 </div>
                 <div className="pt-4 border-t">
@@ -694,6 +802,7 @@ const Payroll = () => {
                       <TableHead>Ishlar soni</TableHead>
                       <TableHead>Jami summa</TableHead>
                       <TableHead>To'langan</TableHead>
+                      <TableHead>Bonus</TableHead>
                       <TableHead>Holat</TableHead>
                       <TableHead className="text-right">Amallar</TableHead>
                     </TableRow>
@@ -708,8 +817,14 @@ const Payroll = () => {
                         <TableCell className="font-bold">
                           {item.total_earnings.toLocaleString()} so'm
                         </TableCell>
+                        <TableCell className="font-semibold">
+                          {(item.paid_amount + (item.bonus_amount || 0)).toLocaleString()} so'm
+                          <span className="block text-xs text-muted-foreground">
+                            Asosiy: {item.paid_amount.toLocaleString()} so'm
+                          </span>
+                        </TableCell>
                         <TableCell>
-                          {item.paid_amount.toLocaleString()} so'm
+                          {item.bonus_amount ? `${item.bonus_amount.toLocaleString()} so'm` : '—'}
                         </TableCell>
                         <TableCell>{getStatusBadge(item.paid_status)}</TableCell>
                         <TableCell className="text-right">
@@ -729,6 +844,8 @@ const Payroll = () => {
                                 onClick={() => {
                                   setSelectedSeamstress(item);
                                   setPaidAmount(item.paid_amount.toString());
+                                setBonusAmountInput((item.bonus_amount || 0).toString());
+                                setBonusNoteInput(item.bonus_note || "");
                                   setPaymentDialog(true);
                                 }}
                               >
@@ -751,7 +868,7 @@ const Payroll = () => {
                         {monthlyData.reduce((sum, item) => sum + item.total_earnings, 0).toLocaleString()} so'm
                       </p>
                       <p className="text-sm text-muted-foreground mt-2">
-                        To'langan: {monthlyData.reduce((sum, item) => sum + item.paid_amount, 0).toLocaleString()} so'm
+                        To'langan: {totalPaidWithBonus.toLocaleString()} so'm
                       </p>
                     </div>
                   </div>
@@ -760,6 +877,165 @@ const Payroll = () => {
             )}
           </CardContent>
         </Card>
+
+        {dailyDates.length > 0 && selectedDailyDate && (
+          <Card>
+            <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <CardTitle>Kundalik eng ko'p ishlaganlar</CardTitle>
+                <CardDescription>
+                  {new Date(selectedDailyDate).toLocaleDateString('uz-UZ')} sanasi natijalari
+                </CardDescription>
+              </div>
+              <Select value={selectedDailyDate} onValueChange={setSelectedDailyDate}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Sana tanlang" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dailyDates.map((date) => (
+                    <SelectItem key={date} value={date}>
+                      {new Date(date).toLocaleDateString('uz-UZ')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="w-full h-72">
+                {dailyChartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={dailyChartData} barCategoryGap="45%" barSize={24}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                        }}
+                        formatter={(value: number) => formatCurrency(value)}
+                      />
+                      <Legend />
+                      <Bar
+                        dataKey="earnings"
+                        name={selectedDailyLabel || "Tanlangan sana"}
+                        fill="hsl(var(--primary))"
+                        radius={[8, 8, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-muted-foreground">
+                    Ushbu kunda ma'lumot topilmadi
+                  </div>
+                )}
+              </div>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>#</TableHead>
+                      <TableHead>Tikuvchi</TableHead>
+                      <TableHead>Bugungi ishlar</TableHead>
+                      <TableHead>Bugungi summa</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {selectedDailyStats.slice(0, 8).map((stat, index) => (
+                      <TableRow key={stat.seamstress_id}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell className="font-medium">{stat.seamstress_name}</TableCell>
+                        <TableCell>{stat.total_items}</TableCell>
+                        <TableCell>{stat.total_earnings.toLocaleString()} so'm</TableCell>
+                      </TableRow>
+                    ))}
+                    {(selectedDailyStats.length === 0) && (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center text-muted-foreground">
+                          Ushbu kunda ma'lumot topilmadi
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {seamstressGrowthOptions.length > 0 && (
+          <Card>
+            <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <CardTitle>Tikuvchilar o'sish grafigi</CardTitle>
+                <CardDescription>
+                  Tanlangan tikuvchining kunlik va umumiy daromadining o'sishi
+                </CardDescription>
+              </div>
+              <Select
+                value={selectedGrowthSeamstress}
+                onValueChange={setSelectedGrowthSeamstress}
+              >
+                <SelectTrigger className="w-[240px]">
+                  <SelectValue placeholder="Tikuvchini tanlang" />
+                </SelectTrigger>
+                <SelectContent>
+                  {seamstressGrowthOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="w-full h-80">
+                {seamstressGrowthData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={seamstressGrowthData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="dateLabel" stroke="hsl(var(--muted-foreground))" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                        }}
+                        formatter={(value: number, name) => {
+                          const label = name === 'daily' ? 'Kunlik daromad' : 'Umumiy daromad';
+                          return [`${value.toLocaleString()} so'm`, label];
+                        }}
+                      />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="daily"
+                        name="Kunlik daromad"
+                        stroke="#0ea5e9"
+                        strokeWidth={2}
+                        dot={{ fill: '#0ea5e9' }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="cumulative"
+                        name="Umumiy daromad"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={2}
+                        dot={{ fill: 'hsl(var(--primary))' }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-muted-foreground">
+                    Tanlangan tikuvchi uchun ma'lumot yo'q
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Payment Dialog */}
         <Dialog open={paymentDialog} onOpenChange={setPaymentDialog}>
@@ -777,17 +1053,30 @@ const Payroll = () => {
                   {selectedSeamstress?.total_earnings.toLocaleString()} so'm
                 </p>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="paid-amount">To'langan summa *</Label>
-                <Input
-                  id="paid-amount"
-                  type="number"
-                  value={paidAmount}
-                  onChange={(e) => setPaidAmount(e.target.value)}
-                  placeholder="0"
-                  step="0.01"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="paid-amount">To'langan summa *</Label>
+                  <Input
+                    id="paid-amount"
+                    type="number"
+                    value={paidAmount}
+                    onChange={(e) => setPaidAmount(e.target.value)}
+                    placeholder="0"
+                    step="0.01"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bonus-amount">Bonus</Label>
+                  <Input
+                    id="bonus-amount"
+                    type="number"
+                    value={bonusAmountInput}
+                    onChange={(e) => setBonusAmountInput(e.target.value)}
+                    placeholder="0"
+                    step="0.01"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="payment-notes">Izoh</Label>
@@ -797,6 +1086,16 @@ const Payroll = () => {
                   onChange={(e) => setPaymentNotes(e.target.value)}
                   placeholder="To'lov haqida qo'shimcha ma'lumot..."
                   rows={3}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="bonus-notes">Bonus izohi</Label>
+                <Textarea
+                  id="bonus-notes"
+                  value={bonusNoteInput}
+                  onChange={(e) => setBonusNoteInput(e.target.value)}
+                  placeholder="Bonus haqida izoh..."
+                  rows={2}
                 />
               </div>
               <Button onClick={handleMarkPayment} className="w-full">

@@ -15,6 +15,10 @@ const Dashboard = () => {
     totalEarnings: 0,
     todayAttendance: false
   });
+  const [dailyStats, setDailyStats] = useState({
+    today: 0,
+    yesterday: 0,
+  });
 
   useEffect(() => {
     if (!loading && !user) {
@@ -68,11 +72,45 @@ const Dashboard = () => {
           totalEarnings: 0,
           todayAttendance: false
         });
+        fetchDailyComparison();
       }
     } catch (error) {
       console.error('Error fetching stats:', error);
     }
   };
+
+  const fetchDailyComparison = async () => {
+    try {
+      const today = new Date();
+      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const startOfTomorrow = new Date(startOfToday);
+      startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+
+      const startOfYesterday = new Date(startOfToday);
+      startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+
+      const { count: todayCount } = await supabase
+        .from('job_items')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', startOfToday.toISOString())
+        .lt('created_at', startOfTomorrow.toISOString());
+
+      const { count: yesterdayCount } = await supabase
+        .from('job_items')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', startOfYesterday.toISOString())
+        .lt('created_at', startOfToday.toISOString());
+
+      setDailyStats({
+        today: todayCount || 0,
+        yesterday: yesterdayCount || 0,
+      });
+    } catch (error) {
+      console.error('Error fetching daily comparison:', error);
+    }
+  };
+
+  const dailyDiff = dailyStats.today - dailyStats.yesterday;
 
   if (loading) {
     return (
@@ -111,6 +149,21 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.openJobs}</div>
+              </CardContent>
+            </Card>
+          )}
+          {profile?.role !== 'SEAMSTRESS' && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">Bugungi ishlar</CardTitle>
+                <Briefcase className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{dailyStats.today}</div>
+                <p className="text-xs text-muted-foreground">Kecha: {dailyStats.yesterday}</p>
+                <p className={`text-sm font-semibold mt-2 ${dailyDiff >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {dailyDiff >= 0 ? '+' : ''}{dailyDiff} ta farq
+                </p>
               </CardContent>
             </Card>
           )}

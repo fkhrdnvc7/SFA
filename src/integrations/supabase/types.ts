@@ -317,6 +317,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
+          completed_at: string | null
           id: string
           job_name: string
           notes: string | null
@@ -327,6 +328,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by: string
+          completed_at?: string | null
           id?: string
           job_name: string
           notes?: string | null
@@ -337,6 +339,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string
+          completed_at?: string | null
           id?: string
           job_name?: string
           notes?: string | null
@@ -421,6 +424,8 @@ export type Database = {
       }
       payroll_records: {
         Row: {
+          bonus_amount: number | null
+          bonus_note: string | null
           created_at: string
           created_by: string
           id: string
@@ -435,6 +440,8 @@ export type Database = {
           year: number
         }
         Insert: {
+          bonus_amount?: number | null
+          bonus_note?: string | null
           created_at?: string
           created_by: string
           id?: string
@@ -449,6 +456,8 @@ export type Database = {
           year: number
         }
         Update: {
+          bonus_amount?: number | null
+          bonus_note?: string | null
           created_at?: string
           created_by?: string
           id?: string
