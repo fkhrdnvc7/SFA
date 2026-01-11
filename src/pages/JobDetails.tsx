@@ -199,12 +199,12 @@ const JobDetails = () => {
     setOperations(data || []);
   };
 
-  // Extract first letter from operation code (before numbers)
+  // Extract letters from operation code (before numbers)
   const getFirstLetterFromCode = (code: string | null | undefined): string | null => {
     if (!code) return null;
-    // Extract letters before any numbers
-    const match = code.match(/^([A-Za-zА-Яа-яЁё])/);
-    return match ? match[1].toUpperCase() : null;
+    // Extract all letters before any numbers
+    const match = code.match(/^([A-Za-zА-Яа-яЁё]+)/);
+    return match ? match[1].toLowerCase() : null;
   };
 
   // Get available letters from operations
@@ -426,16 +426,16 @@ const JobDetails = () => {
                         }}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder={selectedLetterForAdd ? `Harf: ${selectedLetterForAdd}` : selectedOperation ? undefined : "Barchasi"} />
+                          <SelectValue placeholder="Tanlang" />
                         </SelectTrigger>
                         <SelectContent>
-                          {showLettersInAdd && !selectedLetterForAdd ? (
+                          {showLettersInAdd && !selectedLetterForAdd && !selectedOperation ? (
                             <>
                               <SelectItem value="letter:all" className="font-bold">
                                 Barchasi
                               </SelectItem>
                               {getAvailableLetters().map((letter) => (
-                                <SelectItem key={`letter:${letter}`} value={`letter:${letter}`} className="font-bold text-lg">
+                                <SelectItem key={`letter:${letter}`} value={`letter:${letter}`} className="font-normal text-sm">
                                   {letter}
                                 </SelectItem>
                               ))}
@@ -566,16 +566,20 @@ const JobDetails = () => {
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Barchasi" />
+                    <SelectValue placeholder={filterOperation === "all" ? "Barchasi" : 
+                      (() => {
+                        const op = operations.find(o => o.id === filterOperation);
+                        return op ? `${op.code ? `${op.code} - ` : ''}${op.name}` : "Barchasi";
+                      })()} />
                   </SelectTrigger>
                   <SelectContent>
-                    {showLettersInFilter && !selectedLetterForFilter ? (
+                    {showLettersInFilter && !selectedLetterForFilter && filterOperation === "all" ? (
                       <>
                         <SelectItem value="letter:all" className="font-bold">
                           Barchasi
                         </SelectItem>
                         {getAvailableLetters().map((letter) => (
-                          <SelectItem key={`letter:${letter}`} value={`letter:${letter}`} className="font-bold text-lg">
+                          <SelectItem key={`letter:${letter}`} value={`letter:${letter}`} className="font-normal text-sm">
                             {letter}
                           </SelectItem>
                         ))}
