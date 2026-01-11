@@ -1,0 +1,323 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/auth";
+import Layout from "@/components/Layout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { Plus, Briefcase, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+
+interface Job {
+  id: string;
+  job_name: string;
+  status: 'ochiq' | 'yopiq';
+  created_at: string;
+  completed_at?: string | null;
+  notes?: string;
+  total_estimated_amount: number;
+  job_items?: { color?: string }[];
+}
+
+const Jobs = () => {
+  const navigate = useNavigate();
+  const { user, profile, loading } = useAuth();
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  
+  // Form state
+  const [jobName, setJobName] = useState("");
+  const [notes, setNotes] = useState("");
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth");
+    } else if (profile && (profile.role === 'ADMIN' || profile.role === 'MANAGER')) {
+      fetchJobs();
+    } else if (profile && profile.role === 'SEAMSTRESS') {
+      navigate("/dashboard");
+    }
+  }, [user, profile, loading, navigate]);
+
+  const fetchJobs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('jobs')
+        .select(`
+          *,
+          job_items (color)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setJobs(data || []);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      toast.error("Ishlarni yuklashda xatolik");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getUniqueColors = (job: Job) => {
+    if (!job.job_items || job.job_items.length === 0) return [];
+    const colorsSet = new Set<string>();
+    job.job_items.forEach(item => {
+      if (item.color) {
+        const colorList = item.color.split(',').map(c => c.trim()).filter(c => c);
+        colorList.forEach(c => colorsSet.add(c));
+      }
+    });
+    return Array.from(colorsSet);
+  };
+
+  const formatDuration = (job: Job) => {
+    if (job.status !== 'yopiq' || !job.completed_at) return null;
+    const start = new Date(job.created_at);
+    const end = new Date(job.completed_at);
+    const diffMs = end.getTime() - start.getTime();
+    if (diffMs <= 0) return "0 kun";
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const parts = [];
+    if (days > 0) parts.push(`${days} kun`);
+    if (hours > 0) parts.push(`${hours} soat`);
+    if (minutes > 0 && days === 0) parts.push(`${minutes} daqiqa`);
+    return parts.join(' ');
+  };
+
+  const handleCreateJob = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!jobName.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .insert({
+          job_name: jobName,
+          created_by: user?.id,
+          notes: notes || null,
+        });
+
+      if (error) throw error;
+
+      toast.success("Ish muvaffaqiyatli yaratildi");
+      setJobName("");
+      setNotes("");
+      setOpen(false);
+      fetchJobs();
+    } catch (error: any) {
+      console.error('Error creating job:', error);
+      toast.error("Ish yaratishda xatolik");
+    }
+  };
+
+  const handleToggleStatus = async (jobId: string, currentStatus: string) => {
+    const newStatus: 'ochiq' | 'yopiq' = currentStatus === 'ochiq' ? 'yopiq' : 'ochiq';
+    const updates: any = { status: newStatus };
+    if (newStatus === 'yopiq') {
+      updates.completed_at = new Date().toISOString();
+    } else {
+      updates.completed_at = null;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .update(updates)
+        .eq('id', jobId);
+
+      if (error) throw error;
+
+      toast.success(`Ish ${newStatus === 'ochiq' ? 'ochildi' : 'yopildi'}`);
+      fetchJobs();
+    } catch (error: any) {
+      console.error('Error updating job status:', error);
+      toast.error("Statusni yangilashda xatolik");
+    }
+  };
+
+  const handleDeleteJob = async (jobId: string) => {
+    if (!confirm("Ishni o'chirishni tasdiqlaysizmi?")) return;
+
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .delete()
+        .eq('id', jobId);
+
+      if (error) throw error;
+
+      toast.success("Ish o'chirildi");
+      fetchJobs();
+    } catch (error: any) {
+      console.error('Error deleting job:', error);
+      toast.error("Ishni o'chirishda xatolik");
+    }
+  };
+
+  if (loading || isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <p className="text-muted-foreground">Yuklanmoqda...</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Ishlar</h1>
+            <p className="text-muted-foreground">Barcha ishlarni boshqarish</p>
+          </div>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Yangi ish
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Yangi ish yaratish</DialogTitle>
+                <DialogDescription>
+                  Yangi ish yarating va keyinchalik unga operatsiyalar qo'shing
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreateJob} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="job-name">Ish nomi *</Label>
+                  <Input
+                    id="job-name"
+                    value={jobName}
+                    onChange={(e) => setJobName(e.target.value)}
+                    placeholder="Masalan: Qishki kiyim to'plami"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="notes">Izohlar</Label>
+                  <Textarea
+                    id="notes"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Qo'shimcha ma'lumotlar..."
+                    rows={3}
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  Yaratish
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {jobs.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Briefcase className="h-16 w-16 text-muted-foreground mb-4" />
+              <p className="text-xl font-medium mb-2">Hozircha ishlar yo'q</p>
+              <p className="text-muted-foreground mb-4">Yangi ish yarating va boshlang</p>
+              <Button onClick={() => setOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Birinchi ish yaratish
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {jobs.map((job) => (
+              <Card key={job.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <CardTitle 
+                      className="text-lg cursor-pointer flex-1" 
+                      onClick={() => navigate(`/jobs/${job.id}`)}
+                    >
+                      {job.job_name}
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={job.status === 'ochiq' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleStatus(job.id, job.status);
+                        }}
+                      >
+                        {job.status === 'ochiq' ? 'Yopiq qilish' : 'Ochiq qilish'}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteJob(job.id);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <CardDescription>
+                    Boshlanishi: {new Date(job.created_at).toLocaleDateString('uz-UZ')}
+                    {job.status === 'yopiq' && job.completed_at && (
+                      <span className="block text-xs text-green-600 mt-1">
+                        Tugatilgan: {new Date(job.completed_at).toLocaleDateString('uz-UZ')} • Davomiyligi: {formatDuration(job)}
+                      </span>
+                    )}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {job.notes && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                      {job.notes}
+                    </p>
+                  )}
+                  {job.status === 'yopiq' && (
+                    <div className="mt-2">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Ranglar:</p>
+                      {getUniqueColors(job).length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {getUniqueColors(job).map((color, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {color}
+                            </Badge>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">Ranglar ko'rsatilmagan</p>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </Layout>
+  );
+};
+
+export default Jobs;
