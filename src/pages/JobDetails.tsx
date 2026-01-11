@@ -63,6 +63,14 @@ const JobDetails = () => {
   const [quantity, setQuantity] = useState("1");
   const [unitPrice, setUnitPrice] = useState("");
   
+  // Letter filters for operations
+  const [selectedLetterForAdd, setSelectedLetterForAdd] = useState<string | null>(null);
+  const [selectedLetterForFilter, setSelectedLetterForFilter] = useState<string | null>(null);
+  const [showLettersInAdd, setShowLettersInAdd] = useState(true);
+  const [showLettersInFilter, setShowLettersInFilter] = useState(true);
+  const [selectOpenForAdd, setSelectOpenForAdd] = useState(false);
+  const [selectOpenForFilter, setSelectOpenForFilter] = useState(false);
+  
   // Filters
   const [filterSeamstress, setFilterSeamstress] = useState("all");
   const [filterOperation, setFilterOperation] = useState("all");
@@ -191,6 +199,33 @@ const JobDetails = () => {
     setOperations(data || []);
   };
 
+  // Extract first letter from operation code (before numbers)
+  const getFirstLetterFromCode = (code: string | null | undefined): string | null => {
+    if (!code) return null;
+    // Extract letters before any numbers
+    const match = code.match(/^([A-Za-zА-Яа-яЁё])/);
+    return match ? match[1].toUpperCase() : null;
+  };
+
+  // Get available letters from operations
+  const getAvailableLetters = (): string[] => {
+    const letters = new Set<string>();
+    operations.forEach(op => {
+      const letter = getFirstLetterFromCode(op.code);
+      if (letter) letters.add(letter);
+    });
+    return Array.from(letters).sort();
+  };
+
+  // Filter operations by selected letter
+  const getFilteredOperationsByLetter = (letter: string | null): any[] => {
+    if (!letter) return operations;
+    return operations.filter(op => {
+      const opLetter = getFirstLetterFromCode(op.code);
+      return opLetter === letter;
+    });
+  };
+
   const fetchSeamstresses = async () => {
     const { data } = await supabase.from('profiles').select('*').eq('role', 'SEAMSTRESS').eq('is_active', true).order('full_name');
     setSeamstresses(data || []);
@@ -302,6 +337,9 @@ const JobDetails = () => {
     setQuantity("1");
     setUnitPrice("");
     setEditingItem(null);
+    setSelectedLetterForAdd(null);
+    setShowLettersInAdd(true);
+    setSelectOpenForAdd(false);
   };
 
   const clearFilters = () => {
@@ -312,6 +350,9 @@ const JobDetails = () => {
     setFilterSize("");
     setFilterColor("");
     setFilterOrderNumber("");
+    setSelectedLetterForFilter(null);
+    setShowLettersInFilter(true);
+    setSelectOpenForFilter(false);
   };
 
   if (loading || isLoading) return <Layout><div className="flex items-center justify-center h-64"><p>Yuklanmoqda...</p></div></Layout>;
@@ -351,14 +392,76 @@ const JobDetails = () => {
                   {!editingItem && (
                     <div className="space-y-2">
                       <Label>Operatsiya *</Label>
-                      <Select value={selectedOperation} onValueChange={setSelectedOperation}>
-                        <SelectTrigger><SelectValue placeholder="Tanlang" /></SelectTrigger>
+                      <Select 
+                        open={selectOpenForAdd}
+                        onOpenChange={setSelectOpenForAdd}
+                        value={selectedOperation || ''} 
+                        onValueChange={(value) => {
+                          // Agar harf tanlangan bo'lsa
+                          if (value.startsWith('letter:')) {
+                            const letter = value.replace('letter:', '');
+                            if (letter === 'back') {
+                              setSelectedLetterForAdd(null);
+                              setShowLettersInAdd(true);
+                              setSelectedOperation("");
+                            } else if (letter === 'all') {
+                              setSelectedLetterForAdd(null);
+                              setShowLettersInAdd(true);
+                              setSelectedOperation("");
+                            } else {
+                              setSelectedLetterForAdd(letter);
+                              setShowLettersInAdd(false);
+                              setSelectedOperation("");
+                              // Harf tanlanganda avtomatik operatsiyalar ro'yxatini ko'rsatish
+                              setTimeout(() => {
+                                setSelectOpenForAdd(true);
+                              }, 100);
+                            }
+                          } else {
+                            setSelectedOperation(value);
+                            setShowLettersInAdd(true);
+                            setSelectedLetterForAdd(null);
+                            setSelectOpenForAdd(false);
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={selectedLetterForAdd ? `Harf: ${selectedLetterForAdd}` : selectedOperation ? undefined : "Barchasi"} />
+                        </SelectTrigger>
                         <SelectContent>
-                          {operations.map((op) => (
-                            <SelectItem key={op.id} value={op.id}>
-                              {op.name}{op.code ? ` (${op.code})` : ''}{op.default_price > 0 ? ` - ${op.default_price.toLocaleString()} so'm` : ''}
-                            </SelectItem>
-                          ))}
+                          {showLettersInAdd && !selectedLetterForAdd ? (
+                            <>
+                              <SelectItem value="letter:all" className="font-bold">
+                                Barchasi
+                              </SelectItem>
+                              {getAvailableLetters().map((letter) => (
+                                <SelectItem key={`letter:${letter}`} value={`letter:${letter}`} className="font-bold text-lg">
+                                  {letter}
+                                </SelectItem>
+                              ))}
+                            </>
+                          ) : (
+                            <>
+                              <SelectItem value="letter:all" className="font-bold">
+                                Barchasi
+                              </SelectItem>
+                              {selectedLetterForAdd && (
+                                <SelectItem 
+                                  value="letter:back" 
+                                  className="font-bold text-muted-foreground"
+                                >
+                                  ← Orqaga
+                                </SelectItem>
+                              )}
+                              {getFilteredOperationsByLetter(selectedLetterForAdd).map((op) => {
+                                return (
+                                  <SelectItem key={op.id} value={op.id}>
+                                    {op.code ? `${op.code} - ` : ''}{op.name}{op.default_price > 0 ? ` - ${op.default_price.toLocaleString()} so'm` : ''}
+                                  </SelectItem>
+                                );
+                              })}
+                            </>
+                          )}
                         </SelectContent>
                       </Select>
                     </div>
@@ -429,17 +532,74 @@ const JobDetails = () => {
               </div>
               <div className="space-y-2">
                 <Label>Operatsiya</Label>
-                <Select value={filterOperation} onValueChange={setFilterOperation}>
+                <Select 
+                  open={selectOpenForFilter}
+                  onOpenChange={setSelectOpenForFilter}
+                  value={filterOperation} 
+                  onValueChange={(value) => {
+                    // Agar harf tanlangan bo'lsa
+                    if (value.startsWith('letter:')) {
+                      const letter = value.replace('letter:', '');
+                      if (letter === 'back') {
+                        setSelectedLetterForFilter(null);
+                        setShowLettersInFilter(true);
+                        setFilterOperation("all");
+                      } else if (letter === 'all') {
+                        setSelectedLetterForFilter(null);
+                        setShowLettersInFilter(true);
+                        setFilterOperation("all");
+                      } else {
+                        setSelectedLetterForFilter(letter);
+                        setShowLettersInFilter(false);
+                        setFilterOperation("all");
+                        // Harf tanlanganda avtomatik operatsiyalar ro'yxatini ko'rsatish
+                        setTimeout(() => {
+                          setSelectOpenForFilter(true);
+                        }, 100);
+                      }
+                    } else {
+                      setFilterOperation(value);
+                      setShowLettersInFilter(true);
+                      setSelectedLetterForFilter(null);
+                      setSelectOpenForFilter(false);
+                    }
+                  }}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Barchasi" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Barchasi</SelectItem>
-                    {operations.map((op) => (
-                      <SelectItem key={op.id} value={op.id}>
-                        {op.name}
-                      </SelectItem>
-                    ))}
+                    {showLettersInFilter && !selectedLetterForFilter ? (
+                      <>
+                        <SelectItem value="letter:all" className="font-bold">
+                          Barchasi
+                        </SelectItem>
+                        {getAvailableLetters().map((letter) => (
+                          <SelectItem key={`letter:${letter}`} value={`letter:${letter}`} className="font-bold text-lg">
+                            {letter}
+                          </SelectItem>
+                        ))}
+                      </>
+                    ) : (
+                      <>
+                        <SelectItem value="all" className="font-bold">Barchasi</SelectItem>
+                        {selectedLetterForFilter && (
+                          <SelectItem 
+                            value="letter:back" 
+                            className="font-bold text-muted-foreground"
+                          >
+                            ← Orqaga
+                          </SelectItem>
+                        )}
+                        {getFilteredOperationsByLetter(selectedLetterForFilter).map((op) => {
+                          return (
+                            <SelectItem key={op.id} value={op.id}>
+                              {op.code ? `${op.code} - ` : ''}{op.name}
+                            </SelectItem>
+                          );
+                        })}
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -580,7 +740,7 @@ const JobDetails = () => {
                         </TableCell>
                         <TableCell>
                           <div>
-                            <div>{item.operations?.name}</div>
+                            <div className="font-medium">{item.operations?.name || '—'}</div>
                             {item.operations?.code && (
                               <div className="text-xs text-muted-foreground">{item.operations.code}</div>
                             )}
