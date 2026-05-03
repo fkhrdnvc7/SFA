@@ -202,7 +202,6 @@ const JobDetails = () => {
   // Extract letters from operation code (before numbers)
   const getFirstLetterFromCode = (code: string | null | undefined): string | null => {
     if (!code) return null;
-    // Extract all letters before any numbers
     const match = code.match(/^([A-Za-zА-Яа-яЁё]+)/);
     return match ? match[1].toLowerCase() : null;
   };

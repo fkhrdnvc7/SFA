@@ -37,6 +37,7 @@ interface OperationCategory {
   updated_at: string | null;
 }
 
+
 interface Operation {
   id: string;
   code?: string;
@@ -321,7 +322,7 @@ const Operations = () => {
     }
   };
 
-  const handleEditOperation = async (operation: Operation) => {
+  const handleEditOperation = (operation: Operation) => {
     setEditingOperation(operation);
     setSelectedCategoryId(operation.category_id || null);
     setOpName(operation.name);
