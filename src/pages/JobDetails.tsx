@@ -39,8 +39,6 @@ interface JobItem {
   item_date?: string;
   order_number?: number;
   created_at: string;
-  operations: { name: string; code?: string };
-  profiles?: { full_name: string };
 }
 
 const JobDetails = () => {
@@ -117,10 +115,9 @@ const JobDetails = () => {
 
   const fetchJobItems = async () => {
     try {
-      const baseQuery = supabase
-        .from('job_items')
-        .select('*, operations (name, code), profiles (full_name)')
-        .eq('job_id', id!);
+      // Faqat *: Supabase PostgREST "operations" embed uchun FK talab qiladi;
+      // ba'zi bazalarda FK bo'lmasa PGRST200 chiqadi (insert baribir ishlaydi).
+      const baseQuery = supabase.from('job_items').select('*').eq('job_id', id!);
 
       // Apply filters conditionally
       const filters: any[] = [];
@@ -725,7 +722,10 @@ const JobDetails = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    jobItems.map((item) => (
+                    jobItems.map((item) => {
+                      const rowOp = operations.find((o) => o.id === item.operation_id);
+                      const rowSeamstress = seamstresses.find((s) => s.id === item.seamstress_id);
+                      return (
                       <TableRow key={item.id}>
                         <TableCell className="font-medium">
                           {item.order_number ? `#${item.order_number}` : '—'}
@@ -744,13 +744,13 @@ const JobDetails = () => {
                         </TableCell>
                         <TableCell>
                           <div>
-                            <div className="font-medium">{item.operations?.name || '—'}</div>
-                            {item.operations?.code && (
-                              <div className="text-xs text-muted-foreground">{item.operations.code}</div>
+                            <div className="font-medium">{rowOp?.name || '—'}</div>
+                            {rowOp?.code && (
+                              <div className="text-xs text-muted-foreground">{rowOp.code}</div>
                             )}
                           </div>
                         </TableCell>
-                        <TableCell>{item.profiles?.full_name || '—'}</TableCell>
+                        <TableCell>{rowSeamstress?.full_name || '—'}</TableCell>
                         <TableCell>{item.color || '—'}</TableCell>
                         <TableCell>{item.size || '—'}</TableCell>
                         <TableCell>{item.quantity}</TableCell>
@@ -766,7 +766,8 @@ const JobDetails = () => {
                           </TableCell>
                         )}
                       </TableRow>
-                    ))
+                    );
+                    })
                   )}
                 </TableBody>
               </Table>

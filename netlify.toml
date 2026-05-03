@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Bir sahifali ilova: /dashboard, /jobs/:id va hokazo — server 404 bermasligi uchun
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

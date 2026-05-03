@@ -397,7 +397,7 @@ const Payroll = () => {
           quantity,
           unit_price,
           bonus_amount,
-          operations (name),
+          operation_id,
           jobs (job_name)
         `)
         .eq('seamstress_id', seamstressId)
@@ -407,10 +407,18 @@ const Payroll = () => {
 
       if (error) throw error;
 
-      const details: JobItemDetail[] = data.map((item: any) => ({
+      const rows = data || [];
+      const opIds = [...new Set(rows.map((r: any) => r.operation_id).filter(Boolean))];
+      let opNames = new Map<string, string>();
+      if (opIds.length > 0) {
+        const { data: ops } = await supabase.from('operations').select('id, name').in('id', opIds);
+        ops?.forEach((o) => opNames.set(o.id, o.name));
+      }
+
+      const details: JobItemDetail[] = rows.map((item: any) => ({
         id: item.id,
         created_at: item.created_at,
-        operation_name: item.operations?.name || '',
+        operation_name: opNames.get(item.operation_id) || '',
         job_name: item.jobs?.job_name || '',
         color: item.color,
         size: item.size,

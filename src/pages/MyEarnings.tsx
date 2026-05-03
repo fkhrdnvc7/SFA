@@ -18,6 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface JobItem {
   id: string;
+  operation_id: string;
   quantity: number;
   unit_price: number;
   bonus_amount: number | null;
@@ -30,9 +31,7 @@ interface JobItem {
     job_name: string;
     status: string;
   };
-  operations: {
-    name: string;
-  };
+  operation_name?: string;
 }
 
 interface JobEarnings {
@@ -66,25 +65,36 @@ const MyEarnings = () => {
         .from('job_items')
         .select(`
           *,
-          jobs (job_name, status),
-          operations (name)
+          jobs (job_name, status)
         `)
         .eq('seamstress_id', user?.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      setJobItems(data || []);
+      const rows = data || [];
+      const opIds = [...new Set(rows.map((r) => r.operation_id).filter(Boolean))];
+      let opNames = new Map<string, string>();
+      if (opIds.length > 0) {
+        const { data: ops } = await supabase.from('operations').select('id, name').in('id', opIds);
+        ops?.forEach((o) => opNames.set(o.id, o.name));
+      }
+      const enriched = rows.map((row: any) => ({
+        ...row,
+        operation_name: opNames.get(row.operation_id) ?? '—',
+      }));
+
+      setJobItems(enriched);
       
-      const total = data?.reduce((sum, item) => {
+      const total = enriched.reduce((sum, item) => {
         return sum + (item.quantity * item.unit_price) + (item.bonus_amount || 0);
-      }, 0) || 0;
+      }, 0);
       
       setTotalEarnings(total);
 
       // Calculate earnings per job
       const earningsByJob = new Map<string, JobEarnings>();
-      data?.forEach((item: JobItem) => {
+      enriched.forEach((item: JobItem) => {
         const earnings = (item.quantity * item.unit_price) + (item.bonus_amount || 0);
         const existing = earningsByJob.get(item.job_id);
         if (existing) {
@@ -234,7 +244,7 @@ const MyEarnings = () => {
                     jobItems.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell className="font-medium">{item.jobs?.job_name}</TableCell>
-                        <TableCell>{item.operations?.name}</TableCell>
+                        <TableCell>{item.operation_name}</TableCell>
                         <TableCell>{item.quantity}</TableCell>
                         <TableCell>{item.size || '—'}</TableCell>
                         <TableCell>{item.color || '—'}</TableCell>

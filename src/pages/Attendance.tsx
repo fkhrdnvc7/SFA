@@ -1,17 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Clock, LogIn, LogOut, Plus, Edit } from "lucide-react";
+import { Plus, Edit, ChevronDown, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
 import {
   Table,
   TableBody,
@@ -31,12 +33,15 @@ interface AttendanceRecord {
   profiles?: { full_name: string };
 }
 
+function localDateKey(d: Date): string {
+  return d.toLocaleDateString("en-CA");
+}
+
 const Attendance = () => {
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [filteredAttendance, setFilteredAttendance] = useState<AttendanceRecord[]>([]);
-  const [todayAttendance, setTodayAttendance] = useState<AttendanceRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [seamstresses, setSeamstresses] = useState<any[]>([]);
   const [selectedSeamstress, setSelectedSeamstress] = useState<string>("all");
@@ -50,15 +55,52 @@ const Attendance = () => {
   const [markTimeOut, setMarkTimeOut] = useState("");
   const [editingRecord, setEditingRecord] = useState<AttendanceRecord | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  /** Kun kartochkasi qo'lda ochiq/yopiq (undefined = avtomatik: bugun+kelajak ochiq, o'tmish yopiq) */
+  const [dayOpenOverride, setDayOpenOverride] = useState<Record<string, boolean>>({});
+
+  const todayKey = localDateKey(new Date());
+
+  const groupedByDay = useMemo(() => {
+    const map = new Map<string, AttendanceRecord[]>();
+    for (const r of filteredAttendance) {
+      const key = (r.date || "").split("T")[0];
+      if (!key) continue;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(r);
+    }
+    return [...map.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+  }, [filteredAttendance]);
+
+  const isDayExpanded = (dateKey: string) => {
+    if (dateKey in dayOpenOverride) return dayOpenOverride[dateKey];
+    return dateKey >= todayKey;
+  };
+
+  const setDayExpanded = (dateKey: string, open: boolean) => {
+    setDayOpenOverride((prev) => ({ ...prev, [dateKey]: open }));
+  };
+
+  const daySummary = (records: AttendanceRecord[]) => {
+    const present = records.filter(
+      (r) => r.status === "present" || (r.time_in && r.status !== "absent")
+    ).length;
+    const absent = records.filter((r) => r.status === "absent").length;
+    return { present, absent, total: records.length };
+  };
 
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
-    } else if (profile) {
+      return;
+    }
+    if (!loading && profile && profile.role !== 'ADMIN') {
+      setIsLoading(false);
+      navigate("/dashboard");
+      return;
+    }
+    if (profile?.role === 'ADMIN') {
       fetchAttendance();
-      if (profile.role === 'ADMIN' || profile.role === 'MANAGER') {
-        fetchSeamstresses();
-      }
+      fetchSeamstresses();
     }
   }, [user, profile, loading, navigate]);
 
@@ -78,20 +120,7 @@ const Attendance = () => {
 
   const fetchAttendance = async () => {
     try {
-      const today = new Date().toISOString().split('T')[0];
-      
-      // Get today's attendance
-      const { data: todayData } = await supabase
-        .from('attendance')
-        .select('*')
-        .eq('user_id', user?.id)
-        .eq('date', today)
-        .maybeSingle();
-
-      setTodayAttendance(todayData);
-
-      // Get all attendance records
-      let query = supabase
+      const { data, error } = await supabase
         .from('attendance')
         .select(`
           *,
@@ -101,11 +130,6 @@ const Attendance = () => {
         .order('time_in', { ascending: false })
         .limit(100);
 
-      if (profile?.role === 'SEAMSTRESS') {
-        query = query.eq('user_id', user?.id);
-      }
-
-      const { data, error } = await query;
       if (error) throw error;
       setAttendance(data || []);
       setFilteredAttendance(data || []);
@@ -133,48 +157,6 @@ const Attendance = () => {
     }
 
     setFilteredAttendance(filtered);
-  };
-
-  const handleCheckIn = async () => {
-    try {
-      const { error } = await supabase
-        .from('attendance')
-        .insert({
-          user_id: user?.id,
-          date: new Date().toISOString().split('T')[0],
-          time_in: new Date().toISOString(),
-        });
-
-      if (error) throw error;
-
-      toast.success("Kelganingiz belgilandi");
-      fetchAttendance();
-    } catch (error: any) {
-      console.error('Error checking in:', error);
-      toast.error("Belgilashda xatolik");
-    }
-  };
-
-  const handleCheckOut = async () => {
-    if (!todayAttendance) return;
-
-    try {
-      const { error } = await supabase
-        .from('attendance')
-        .update({
-          time_out: new Date().toISOString(),
-        })
-        .eq('id', todayAttendance.id)
-        .eq('user_id', user?.id);
-
-      if (error) throw error;
-
-      toast.success("Ketganingiz belgilandi");
-      fetchAttendance();
-    } catch (error: any) {
-      console.error('Error checking out:', error);
-      toast.error("Belgilashda xatolik");
-    }
   };
 
   const formatTime = (timestamp?: string) => {
@@ -362,7 +344,7 @@ const Attendance = () => {
     setMarkTimeOut("");
   };
 
-  if (loading || isLoading) {
+  if (loading || isLoading || profile?.role !== 'ADMIN') {
     return (
       <Layout>
         <div className="flex items-center justify-center h-64">
@@ -377,62 +359,17 @@ const Attendance = () => {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Davomat</h1>
-          <p className="text-muted-foreground">Keldi-ketdi tizimi</p>
+          <p className="text-muted-foreground">
+            Tikuvchilar uchun keldi-ketdi vaqtini faqat admin belgilaydi
+          </p>
         </div>
-
-        {profile?.role === 'SEAMSTRESS' && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Bugungi davomat</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {!todayAttendance ? (
-                <div className="text-center py-8">
-                  <Clock className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-lg mb-4">Bugun hali belgilanmagan</p>
-                  <Button size="lg" onClick={handleCheckIn}>
-                    <LogIn className="h-5 w-5 mr-2" />
-                    Kelganimni belgilash
-                  </Button>
-                </div>
-              ) : !todayAttendance.time_out ? (
-                <div className="text-center py-8">
-                  <div className="flex justify-center items-center gap-2 mb-4">
-                    <Clock className="h-16 w-16 text-primary" />
-                  </div>
-                  <p className="text-lg mb-2">
-                    Kelgan vaqt: <span className="font-bold">{formatTime(todayAttendance.time_in)}</span>
-                  </p>
-                  <p className="text-muted-foreground mb-4">Ish jarayonida...</p>
-                  <Button size="lg" variant="outline" onClick={handleCheckOut}>
-                    <LogOut className="h-5 w-5 mr-2" />
-                    Ketganimni belgilash
-                  </Button>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-lg mb-2">
-                    Kelgan: <span className="font-bold">{formatTime(todayAttendance.time_in)}</span>
-                  </p>
-                  <p className="text-lg mb-2">
-                    Ketgan: <span className="font-bold">{formatTime(todayAttendance.time_out)}</span>
-                  </p>
-                  <p className="text-muted-foreground">
-                    Umumiy: {calculateDuration(todayAttendance.time_in, todayAttendance.time_out)}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
 
         <Card>
           <CardHeader>
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <CardTitle>Davomat tarixi</CardTitle>
-                {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
-                  <Dialog open={isMarkDialogOpen} onOpenChange={setIsMarkDialogOpen}>
+                <Dialog open={isMarkDialogOpen} onOpenChange={setIsMarkDialogOpen}>
                     <DialogTrigger asChild>
                       <Button>
                         <Plus className="h-4 w-4 mr-2" />
@@ -510,9 +447,7 @@ const Attendance = () => {
                       </form>
                     </DialogContent>
                   </Dialog>
-                )}
               </div>
-              {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
                 <Dialog open={isEditDialogOpen} onOpenChange={(open) => {
                   setIsEditDialogOpen(open);
                   if (!open) resetEditForm();
@@ -580,8 +515,6 @@ const Attendance = () => {
                     </form>
                   </DialogContent>
                 </Dialog>
-              )}
-              {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
                 <div className="flex gap-2 flex-wrap">
                   <div className="flex items-center gap-2">
                     <Label className="text-sm whitespace-nowrap">Ishchi:</Label>
@@ -631,64 +564,144 @@ const Attendance = () => {
                     </Button>
                   )}
                 </div>
-              )}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-2">
             {filteredAttendance.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
+              <p className="text-center text-muted-foreground py-10">
                 Hozircha ma'lumotlar yo'q
               </p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
-                      <TableHead>Ism</TableHead>
-                    )}
-                    <TableHead>Sana</TableHead>
-                    <TableHead>Holat</TableHead>
-                    <TableHead>Kelgan</TableHead>
-                    <TableHead>Ketgan</TableHead>
-                    <TableHead>Davomiyligi</TableHead>
-                    {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
-                      <TableHead>Amallar</TableHead>
-                    )}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredAttendance.map((record) => (
-                    <TableRow key={record.id}>
-                      {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
-                        <TableCell className="font-medium">
-                          {record.profiles?.full_name}
-                        </TableCell>
-                      )}
-                      <TableCell>
-                        {new Date(record.date).toLocaleDateString('uz-UZ')}
-                      </TableCell>
-                      <TableCell>{getStatusBadge(record)}</TableCell>
-                      <TableCell>{formatTime(record.time_in)}</TableCell>
-                      <TableCell>{formatTime(record.time_out)}</TableCell>
-                      <TableCell>
-                        {calculateDuration(record.time_in, record.time_out)}
-                      </TableCell>
-                      {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => handleEditRecord(record)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="space-y-3">
+                {groupedByDay.map(([dateKey, records]) => {
+                  const expanded = isDayExpanded(dateKey);
+                  const { present, absent, total } = daySummary(records);
+                  const isToday = dateKey === todayKey;
+                  const isPast = dateKey < todayKey;
+                  const weekday = new Date(dateKey + "T12:00:00").toLocaleDateString("uz-UZ", {
+                    weekday: "long",
+                  });
+
+                  return (
+                    <Collapsible
+                      key={dateKey}
+                      open={expanded}
+                      onOpenChange={(open) => setDayExpanded(dateKey, open)}
+                    >
+                      <Card
+                        className={cn(
+                          "overflow-hidden transition-shadow",
+                          isToday && "ring-2 ring-primary/30 shadow-md",
+                          isPast && !expanded && "bg-muted/40"
+                        )}
+                      >
+                        <CollapsibleTrigger asChild>
+                          <CardHeader className="cursor-pointer select-none py-4 space-y-0 gap-0 hover:bg-muted/50 transition-colors">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex items-start gap-3 min-w-0">
+                                <div
+                                  className={cn(
+                                    "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-bold",
+                                    isToday
+                                      ? "bg-primary text-primary-foreground"
+                                      : "bg-muted text-muted-foreground"
+                                  )}
+                                >
+                                  {dateKey.slice(8, 10)}
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <CardTitle className="text-base font-semibold">
+                                      {new Date(dateKey + "T12:00:00").toLocaleDateString("uz-UZ", {
+                                        day: "numeric",
+                                        month: "long",
+                                        year: "numeric",
+                                      })}
+                                    </CardTitle>
+                                    {isToday && (
+                                      <Badge variant="default" className="text-xs">
+                                        Bugun
+                                      </Badge>
+                                    )}
+                                    {isPast && (
+                                      <Badge variant="secondary" className="text-xs">
+                                        O'tgan kun
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <CardDescription className="mt-1 capitalize">
+                                    {weekday} · {total} ta yozuv
+                                  </CardDescription>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <div className="hidden sm:flex items-center gap-3 text-xs text-muted-foreground">
+                                  <span className="flex items-center gap-1">
+                                    <Users className="h-3.5 w-3.5" />
+                                    Kelgan: {present}
+                                  </span>
+                                  {absent > 0 && (
+                                    <span className="text-destructive">Kelmagan: {absent}</span>
+                                  )}
+                                </div>
+                                <ChevronDown
+                                  className={cn(
+                                    "h-5 w-5 text-muted-foreground transition-transform duration-200",
+                                    expanded && "rotate-180"
+                                  )}
+                                />
+                              </div>
+                            </div>
+                          </CardHeader>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <CardContent className="pt-0 pb-4 px-4 sm:px-6 border-t bg-card/50">
+                            <div className="overflow-x-auto rounded-lg border bg-background">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow className="hover:bg-transparent">
+                                    <TableHead>Ism</TableHead>
+                                    <TableHead>Holat</TableHead>
+                                    <TableHead>Kelgan</TableHead>
+                                    <TableHead>Ketgan</TableHead>
+                                    <TableHead>Davomiyligi</TableHead>
+                                    <TableHead className="w-[52px]" />
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {records.map((record) => (
+                                    <TableRow key={record.id}>
+                                      <TableCell className="font-medium">
+                                        {record.profiles?.full_name}
+                                      </TableCell>
+                                      <TableCell>{getStatusBadge(record)}</TableCell>
+                                      <TableCell>{formatTime(record.time_in)}</TableCell>
+                                      <TableCell>{formatTime(record.time_out)}</TableCell>
+                                      <TableCell>
+                                        {calculateDuration(record.time_in, record.time_out)}
+                                      </TableCell>
+                                      <TableCell>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-8 w-8"
+                                          onClick={() => handleEditRecord(record)}
+                                        >
+                                          <Edit className="h-4 w-4" />
+                                        </Button>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </CardContent>
+                        </CollapsibleContent>
+                      </Card>
+                    </Collapsible>
+                  );
+                })}
+              </div>
             )}
           </CardContent>
         </Card>

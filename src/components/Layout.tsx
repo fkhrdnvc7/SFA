@@ -39,7 +39,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     { to: "/revenue", label: "Daromad", icon: TrendingUp, roles: ['ADMIN', 'MANAGER'] },
     { to: "/expenses", label: "Xarajatlar", icon: Receipt, roles: ['ADMIN', 'MANAGER'] },
     { to: "/operations", label: "Operatsiyalar", icon: Scissors, roles: ['ADMIN', 'MANAGER'] },
-    { to: "/attendance", label: "Davomat", icon: Clock },
+    { to: "/attendance", label: "Davomat", icon: Clock, roles: ['ADMIN'] },
     { to: "/my-earnings", label: "Daromadlarim", icon: DollarSign, roles: ['SEAMSTRESS'] },
     { to: "/payroll", label: "Oylik maosh", icon: DollarSign, roles: ['ADMIN', 'MANAGER'] },
     { to: "/users", label: "Foydalanuvchilar", icon: Users, roles: ['ADMIN'] },

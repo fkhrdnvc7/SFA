@@ -429,7 +429,14 @@ const Operations = () => {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categories.map((category) => (
+            {categories.map((category) => {
+              const catOps = categoryOps[category.id] || [];
+              const opCount = catOps.length;
+              const categoryTotalPrice = catOps.reduce(
+                (sum, op) => sum + (Number(op.default_price) || 0),
+                0
+              );
+              return (
               <Card key={category.id} className="flex flex-col">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
@@ -458,18 +465,21 @@ const Operations = () => {
                       </Button>
                     </div>
                   </div>
-                  <div className="mt-2">
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
                     <Badge variant="secondary">
-                      {(categoryOps[category.id] || []).length} operatsiya
+                      {opCount} operatsiya
+                    </Badge>
+                    <Badge variant="outline" className="font-medium tabular-nums">
+                      Jami: {categoryTotalPrice.toLocaleString()} so'm
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 space-y-3">
-                  {categoryOps[category.id] && categoryOps[category.id].length > 0 ? (
+                  {catOps.length > 0 ? (
                     <div className="space-y-2">
                       {expandedCategories[category.id] ? (
                         <div className="space-y-2 max-h-64 overflow-y-auto">
-                          {categoryOps[category.id].map((op) => (
+                          {catOps.map((op) => (
                             <div key={op.id} className="flex items-center justify-between text-sm p-2 bg-muted rounded">
                               <div className="flex-1 min-w-0">
                                 <p className="font-mono text-xs text-muted-foreground">{op.code}</p>
@@ -499,7 +509,7 @@ const Operations = () => {
                         </div>
                       ) : (
                         <p className="text-xs text-muted-foreground py-2">
-                          {categoryOps[category.id].length} operatsiya mavjud
+                          {opCount} operatsiya · jami narx: {categoryTotalPrice.toLocaleString()} so'm
                         </p>
                       )}
                       <Button
@@ -600,7 +610,8 @@ const Operations = () => {
                   </Dialog>
                 </CardContent>
               </Card>
-            ))}
+            );
+            })}
           </div>
         )}
 

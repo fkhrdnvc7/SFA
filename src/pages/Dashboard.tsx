@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Briefcase, DollarSign, Clock, TrendingUp, ClipboardList, Receipt } from "lucide-react";
+import { Briefcase, DollarSign, TrendingUp, ClipboardList, Receipt, Clock } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -13,7 +13,6 @@ const Dashboard = () => {
     totalJobs: 0,
     openJobs: 0,
     totalEarnings: 0,
-    todayAttendance: false
   });
   const [dailyStats, setDailyStats] = useState({
     today: 0,
@@ -45,18 +44,10 @@ const Dashboard = () => {
           return sum + (item.quantity * item.unit_price) + (item.bonus_amount || 0);
         }, 0) || 0;
 
-        const { data: attendance } = await supabase
-          .from('attendance')
-          .select('*')
-          .eq('user_id', user?.id)
-          .eq('date', new Date().toISOString().split('T')[0])
-          .single();
-
         setStats({
           totalJobs: jobItems?.length || 0,
           openJobs: 0,
           totalEarnings,
-          todayAttendance: !!attendance
         });
       } else {
         // Get manager/admin stats
@@ -70,7 +61,6 @@ const Dashboard = () => {
           totalJobs: jobs?.length || 0,
           openJobs,
           totalEarnings: 0,
-          todayAttendance: false
         });
         fetchDailyComparison();
       }
@@ -169,31 +159,17 @@ const Dashboard = () => {
           )}
 
           {profile?.role === 'SEAMSTRESS' && (
-            <>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Jami daromad</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {stats.totalEarnings.toLocaleString()} so'm
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Bugungi davomat</CardTitle>
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {stats.todayAttendance ? '✓' : '—'}
-                  </div>
-                </CardContent>
-              </Card>
-            </>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">Jami daromad</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {stats.totalEarnings.toLocaleString()} so'm
+                </div>
+              </CardContent>
+            </Card>
           )}
         </div>
 
@@ -208,30 +184,32 @@ const Dashboard = () => {
             {profile?.role === 'SEAMSTRESS' && (
               <div className="flex gap-2">
                 <button
-                  onClick={() => navigate('/attendance')}
-                  className="flex-1 p-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+                  onClick={() => navigate('/my-tasks')}
+                  className="flex-1 p-4 bg-secondary text-secondary-foreground rounded-lg hover:opacity-90 transition-opacity"
                 >
-                  <Clock className="h-6 w-6 mb-2 mx-auto" />
-                  <p className="font-medium">Davomatga belgilash</p>
+                  <ClipboardList className="h-6 w-6 mb-2 mx-auto" />
+                  <p className="font-medium">Vazifalarim</p>
                 </button>
-                    <button
-                      onClick={() => navigate('/my-tasks')}
-                      className="flex-1 p-4 bg-secondary text-secondary-foreground rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      <ClipboardList className="h-6 w-6 mb-2 mx-auto" />
-                      <p className="font-medium">Vazifalarim</p>
-                    </button>
-                    <button
-                      onClick={() => navigate('/my-earnings')}
-                      className="flex-1 p-4 bg-green-600 text-white rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      <DollarSign className="h-6 w-6 mb-2 mx-auto" />
-                      <p className="font-medium">Daromadlarim</p>
-                    </button>
+                <button
+                  onClick={() => navigate('/my-earnings')}
+                  className="flex-1 p-4 bg-green-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  <DollarSign className="h-6 w-6 mb-2 mx-auto" />
+                  <p className="font-medium">Daromadlarim</p>
+                </button>
               </div>
             )}
             {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                {profile?.role === 'ADMIN' && (
+                  <button
+                    onClick={() => navigate('/attendance')}
+                    className="p-4 bg-slate-700 text-white rounded-lg hover:opacity-90 transition-opacity"
+                  >
+                    <Clock className="h-6 w-6 mb-2 mx-auto" />
+                    <p className="font-medium">Davomat</p>
+                  </button>
+                )}
                 <button
                   onClick={() => navigate('/jobs')}
                   className="p-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"

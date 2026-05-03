@@ -406,33 +406,32 @@ CREATE POLICY "Seamstresses can view their own job items"
     public.get_user_role(auth.uid()) IN ('ADMIN', 'MANAGER')
   );
 
--- Attendance policies
+-- Attendance policies (faqat ADMIN)
 DROP POLICY IF EXISTS "Users can view their own attendance" ON public.attendance;
 DROP POLICY IF EXISTS "Users can insert their own attendance" ON public.attendance;
 DROP POLICY IF EXISTS "Users can update their own attendance" ON public.attendance;
 DROP POLICY IF EXISTS "Admins and managers can manage all attendance" ON public.attendance;
+DROP POLICY IF EXISTS "Admins can select attendance" ON public.attendance;
+DROP POLICY IF EXISTS "Admins can insert attendance" ON public.attendance;
+DROP POLICY IF EXISTS "Admins can update attendance" ON public.attendance;
+DROP POLICY IF EXISTS "Admins can delete attendance" ON public.attendance;
 
-CREATE POLICY "Users can view their own attendance"
+CREATE POLICY "Admins can select attendance"
   ON public.attendance FOR SELECT
-  USING (
-    user_id = auth.uid() OR
-    public.get_user_role(auth.uid()) IN ('ADMIN', 'MANAGER')
-  );
+  USING (public.get_user_role(auth.uid()) = 'ADMIN');
 
-CREATE POLICY "Users can insert their own attendance"
+CREATE POLICY "Admins can insert attendance"
   ON public.attendance FOR INSERT
-  WITH CHECK (user_id = auth.uid());
+  WITH CHECK (public.get_user_role(auth.uid()) = 'ADMIN');
 
-CREATE POLICY "Users can update their own attendance"
+CREATE POLICY "Admins can update attendance"
   ON public.attendance FOR UPDATE
-  USING (user_id = auth.uid())
-  WITH CHECK (user_id = auth.uid());
+  USING (public.get_user_role(auth.uid()) = 'ADMIN')
+  WITH CHECK (public.get_user_role(auth.uid()) = 'ADMIN');
 
-CREATE POLICY "Admins and managers can manage all attendance"
-  ON public.attendance FOR ALL
-  USING (
-    public.get_user_role(auth.uid()) IN ('ADMIN', 'MANAGER')
-  );
+CREATE POLICY "Admins can delete attendance"
+  ON public.attendance FOR DELETE
+  USING (public.get_user_role(auth.uid()) = 'ADMIN');
 
 -- Payroll records policies
 DROP POLICY IF EXISTS "Seamstresses can view their own payroll records" ON public.payroll_records;
