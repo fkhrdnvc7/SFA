@@ -357,8 +357,36 @@ export type Database = {
           },
         ]
       }
+      operation_categories: {
+        Row: {
+          code_prefix: string
+          created_at: string
+          display_order: number
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          code_prefix: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          code_prefix?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       operations: {
         Row: {
+          category_id: string | null
           code: string | null
           created_at: string
           default_price: number | null
@@ -367,6 +395,7 @@ export type Database = {
           unit: string | null
         }
         Insert: {
+          category_id?: string | null
           code?: string | null
           created_at?: string
           default_price?: number | null
@@ -375,6 +404,7 @@ export type Database = {
           unit?: string | null
         }
         Update: {
+          category_id?: string | null
           code?: string | null
           created_at?: string
           default_price?: number | null
@@ -382,7 +412,15 @@ export type Database = {
           name?: string
           unit?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "operations_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "operation_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       outgoing_jobs: {
         Row: {

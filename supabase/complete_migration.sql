@@ -27,15 +27,32 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- Enable RLS on profiles
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- 3. Create operations table (catalog of sewing operations)
+-- 3. Create operation_categories table (category groups for operations)
+CREATE TABLE IF NOT EXISTS public.operation_categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  code_prefix TEXT NOT NULL UNIQUE,
+  display_order INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Enable RLS on operation_categories
+ALTER TABLE public.operation_categories ENABLE ROW LEVEL SECURITY;
+
+-- 3.1. Create operations table (catalog of sewing operations)
 CREATE TABLE IF NOT EXISTS public.operations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   code TEXT UNIQUE,
   name TEXT NOT NULL,
   default_price NUMERIC(12, 2) DEFAULT 0,
   unit TEXT DEFAULT 'dona',
+  category_id UUID REFERENCES public.operation_categories(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
+
+-- Create index on category_id for efficient queries
+CREATE INDEX IF NOT EXISTS idx_operations_category_id ON public.operations(category_id);
 
 -- Enable RLS on operations
 ALTER TABLE public.operations ENABLE ROW LEVEL SECURITY;
@@ -259,6 +276,11 @@ CREATE TRIGGER update_jobs_updated_at
   BEFORE UPDATE ON public.jobs
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_operation_categories_updated_at ON public.operation_categories;
+CREATE TRIGGER update_operation_categories_updated_at
+  BEFORE UPDATE ON public.operation_categories
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
 DROP TRIGGER IF EXISTS update_settings_updated_at ON public.settings;
 CREATE TRIGGER update_settings_updated_at
   BEFORE UPDATE ON public.settings
@@ -306,6 +328,37 @@ CREATE POLICY "Admins can update profiles"
   ON public.profiles FOR UPDATE
   USING (
     public.get_user_role(auth.uid()) = 'ADMIN'
+  );
+
+-- Operation Categories policies
+DROP POLICY IF EXISTS "Everyone can view operation categories" ON public.operation_categories;
+DROP POLICY IF EXISTS "Admins and managers can create operation categories" ON public.operation_categories;
+DROP POLICY IF EXISTS "Admins and managers can update operation categories" ON public.operation_categories;
+DROP POLICY IF EXISTS "Admins and managers can delete operation categories" ON public.operation_categories;
+
+CREATE POLICY "Everyone can view operation categories"
+  ON public.operation_categories FOR SELECT
+  USING (true);
+
+CREATE POLICY "Admins and managers can create operation categories"
+  ON public.operation_categories FOR INSERT
+  WITH CHECK (
+    public.get_user_role(auth.uid()) IN ('ADMIN', 'MANAGER')
+  );
+
+CREATE POLICY "Admins and managers can update operation categories"
+  ON public.operation_categories FOR UPDATE
+  USING (
+    public.get_user_role(auth.uid()) IN ('ADMIN', 'MANAGER')
+  )
+  WITH CHECK (
+    public.get_user_role(auth.uid()) IN ('ADMIN', 'MANAGER')
+  );
+
+CREATE POLICY "Admins and managers can delete operation categories"
+  ON public.operation_categories FOR DELETE
+  USING (
+    public.get_user_role(auth.uid()) IN ('ADMIN', 'MANAGER')
   );
 
 -- Operations policies
