@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Scissors } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -65,11 +64,13 @@ const Auth = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-accent/40 to-secondary/30 p-4">
+      <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <Scissors className="h-12 w-12 text-primary" />
+          <div className="mb-4 flex justify-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary text-xl font-bold text-primary-foreground shadow-sm">
+              SFA
+            </div>
           </div>
           <CardTitle className="text-2xl">SFA Tailoring</CardTitle>
           <CardDescription>Tikuvchilik ustaxonasi boshqaruv tizimi</CardDescription>

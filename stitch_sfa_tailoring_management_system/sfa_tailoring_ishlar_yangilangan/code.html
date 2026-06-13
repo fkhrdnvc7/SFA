@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html class="light" lang="uz"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ishlar - SFA Tailoring</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed-dim": "#c0c6db",
+                      "tertiary-fixed-dim": "#ffb596",
+                      "surface-dim": "#d3daea",
+                      "secondary": "#575e70",
+                      "surface-tint": "#0053db",
+                      "error": "#ba1a1a",
+                      "on-tertiary": "#ffffff",
+                      "on-surface-variant": "#434655",
+                      "inverse-surface": "#2a313d",
+                      "outline": "#737686",
+                      "surface-variant": "#dce2f3",
+                      "secondary-container": "#d9dff5",
+                      "primary": "#004ac6",
+                      "primary-fixed": "#dbe1ff",
+                      "tertiary": "#943700",
+                      "outline-variant": "#c3c6d7",
+                      "on-primary-container": "#eeefff",
+                      "inverse-primary": "#b4c5ff",
+                      "on-secondary-fixed-variant": "#404758",
+                      "secondary-fixed": "#dce2f7",
+                      "surface-bright": "#f9f9ff",
+                      "surface-container-highest": "#dce2f3",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "on-background": "#151c27",
+                      "tertiary-fixed": "#ffdbcd",
+                      "background": "#f9f9ff",
+                      "surface": "#f9f9ff",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "inverse-on-surface": "#ebf1ff",
+                      "tertiary-container": "#bc4800",
+                      "error-container": "#ffdad6",
+                      "on-surface": "#151c27",
+                      "on-secondary-fixed": "#141b2b",
+                      "on-primary-fixed": "#00174b",
+                      "surface-container": "#e7eefe",
+                      "on-error-container": "#93000a",
+                      "primary-container": "#2563eb",
+                      "on-tertiary-fixed-variant": "#7d2d00",
+                      "surface-container-low": "#f0f3ff",
+                      "on-tertiary-fixed": "#360f00",
+                      "on-primary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "on-tertiary-container": "#ffede6",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-container": "#5c6274",
+                      "on-secondary": "#ffffff",
+                      "surface-container-high": "#e2e8f8"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sidebar-width": "280px",
+                      "element-gap": "16px",
+                      "grid-gutter": "20px",
+                      "container-padding": "24px"
+              },
+              "fontFamily": {
+                      "stat-display": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "page-title": [
+                              "Inter"
+                      ],
+                      "table-header": [
+                              "Inter"
+                      ],
+                      "body-main": [
+                              "Inter"
+                      ],
+                      "section-title": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "stat-display": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "page-title": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "table-header": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-main": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "section-title": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+      </style>
+</head>
+<body class="bg-surface text-on-surface font-body-main text-body-main antialiased h-screen overflow-hidden flex">
+<!-- SideNavBar -->
+<nav class="hidden md:flex bg-inverse-surface dark:bg-inverse-surface w-[280px] h-screen fixed left-0 top-0 flex-col flex-shrink-0 z-50">
+<!-- Brand Header -->
+<div class="h-16 flex items-center px-6 bg-inverse-surface border-b border-white/10">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary font-bold">S</div>
+<div>
+<h1 class="font-page-title text-page-title text-inverse-on-surface text-lg leading-tight">SFA Tailoring</h1>
+</div>
+</div>
+</div>
+<!-- Scrollable Nav Items -->
+<div class="flex-1 overflow-y-auto py-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Asosiy</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 border-l-2 border-primary bg-on-surface/10 text-on-primary font-bold hover:bg-primary/10 transition-colors" href="#" style="transform: scale(0.98);">
+<span class="material-symbols-outlined">apparel</span>
+<span>Ishlar</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span>Vazifalar</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">login</span>
+<span>Kirim</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Chiqim</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span>Daromad</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span>Xarajatlar</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">settings_applications</span>
+<span>Operatsiyalar</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">fingerprint</span>
+<span>Davomat</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span>Maosh</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Foydalanuvchilar</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span>Hisobotlar</span>
+</a>
+</div>
+<!-- Footer Actions -->
+<div class="p-4 border-t border-white/10 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-2 py-2 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors rounded" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span>Profil</span>
+</a>
+<a class="flex items-center gap-3 px-2 py-2 text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors rounded" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Sozlamalar</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col md:ml-[280px] w-full min-h-screen relative bg-background">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-surface-dim sticky top-0 w-full z-40 border-b border-outline-variant flex justify-between items-center px-container-padding h-16 shrink-0">
+<!-- Left: Search (Mobile Menu Toggle if needed later) -->
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="pl-9 pr-4 py-1.5 bg-surface-container-low border-none rounded-full text-sm focus:ring-1 focus:ring-primary w-64 text-on-surface" placeholder="Qidiruv..." type="text"/>
+</div>
+</div>
+<!-- Right: Actions & Profile -->
+<div class="flex items-center gap-element-gap">
+<button class="bg-primary-container text-on-primary hover:opacity-90 px-4 py-1.5 rounded-lg font-label-sm text-label-sm transition-opacity hidden sm:block">
+                    Yangi Buyurtma
+                </button>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-all rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-all rounded-full hover:bg-surface-container-high hidden sm:block">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+<div class="w-8 h-8 rounded-full bg-secondary-container overflow-hidden border border-outline-variant">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfRR9zxQoDpBTuaUaYJA-WUabgjBkLjexENsHMKkPQ8sqo1Ul1rQ5GPIHLhLdaDgaFuvonkRVRyUxTCdyWjLxfWIF9mC486Ocj4z5sprc3VYyneNyuiP50DEmS8f5eADHk8p3ygfImv1T4q7M-xe4HObjDcIfmFtVgHOw9s1utk5vT7pzF1HWELLprttIF1xhN_SISpJyXo7mRNwkUBz-tHW2qaHhtURt9OT1Rk07Y7Q0hUz1_oYrR"/>
+</div>
+</div>
+</header>
+<!-- Page Canvas -->
+<main class="flex-1 overflow-y-auto p-container-padding pb-24 md:pb-container-padding">
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+<div>
+<h2 class="font-page-title text-page-title text-on-surface">Ishlar</h2>
+<p class="text-on-surface-variant text-sm mt-1">Barcha faol va yopilgan ishlar ro'yxati</p>
+</div>
+<button class="bg-primary-container text-on-primary hover:opacity-90 px-5 py-2.5 rounded-lg font-label-sm text-label-sm transition-opacity flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'wght' 600;">add</span>
+                    Yangi ish
+                </button>
+</div>
+<!-- Bento-style Grid for Jobs -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-grid-gutter">
+<!-- Open Job Card 1 -->
+<div class="bg-surface border border-outline-variant rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden group hover:border-primary/30 transition-colors">
+<!-- Status & Menu -->
+<div class="flex justify-between items-start">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                            Ochiq
+                        </span>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Content -->
+<div class="flex-1">
+<h3 class="font-section-title text-section-title text-on-surface mb-1">Erkaklar ko'ylagi</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2">Buyurtmachi: "Textile Pro" MChJ. 500 dona oq ko'ylak, standart o'lchamlar to'plami.</p>
+</div>
+<!-- Footer Info -->
+<div class="pt-4 border-t border-outline-variant/50 flex flex-col gap-3">
+<div class="flex items-center gap-2 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>2025-01-15</span>
+</div>
+<!-- Actions -->
+<div class="flex gap-2">
+<button class="flex-1 bg-surface border border-outline-variant text-on-surface hover:bg-surface-container-high px-3 py-2 rounded-lg text-sm font-medium transition-colors text-center">
+                                Yopish
+                            </button>
+<button class="px-3 py-2 rounded-lg border border-outline-variant text-error hover:bg-error/5 transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Open Job Card 2 -->
+<div class="bg-surface border border-outline-variant rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden group hover:border-primary/30 transition-colors">
+<div class="flex justify-between items-start">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                            Ochiq
+                        </span>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="flex-1">
+<h3 class="font-section-title text-section-title text-on-surface mb-1">Maktab formasi</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2">Toshkent shahar 15-maktab uchun kuzgi formalar. 1200 to'plam.</p>
+</div>
+<div class="pt-4 border-t border-outline-variant/50 flex flex-col gap-3">
+<div class="flex items-center gap-2 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>2025-02-01</span>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-surface border border-outline-variant text-on-surface hover:bg-surface-container-high px-3 py-2 rounded-lg text-sm font-medium transition-colors text-center">
+                                Yopish
+                            </button>
+<button class="px-3 py-2 rounded-lg border border-outline-variant text-error hover:bg-error/5 transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Open Job Card 3 -->
+<div class="bg-surface border border-outline-variant rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden group hover:border-primary/30 transition-colors">
+<div class="flex justify-between items-start">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                            Ochiq
+                        </span>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="flex-1">
+<h3 class="font-section-title text-section-title text-on-surface mb-1">Kuzgi kurtka</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2">Maxsus dizayn asosida 300 dona qishki kurtka tikish jarayoni.</p>
+</div>
+<div class="pt-4 border-t border-outline-variant/50 flex flex-col gap-3">
+<div class="flex items-center gap-2 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>2025-02-10</span>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-surface border border-outline-variant text-on-surface hover:bg-surface-container-high px-3 py-2 rounded-lg text-sm font-medium transition-colors text-center">
+                                Yopish
+                            </button>
+<button class="px-3 py-2 rounded-lg border border-outline-variant text-error hover:bg-error/5 transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Closed Job Card 1 -->
+<div class="bg-surface-container-low border border-outline-variant/60 rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+<div class="flex justify-between items-start">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-container text-on-secondary-container">
+                            Yopiq
+                        </span>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="flex-1">
+<h3 class="font-section-title text-section-title text-on-surface mb-1">Xalat tikish</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2">Tibbiyot xodimlari uchun oq xalatlar. 800 dona. Partiya to'liq topshirildi.</p>
+</div>
+<div class="pt-4 border-t border-outline-variant/40 flex flex-col gap-3">
+<div class="flex items-center gap-2 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>2024-12-20</span>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-surface-container-highest text-on-surface-variant px-3 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-50" disabled="">
+                                Yopilgan
+                            </button>
+<button class="px-3 py-2 rounded-lg border border-outline-variant text-error hover:bg-error/5 transition-colors flex items-center justify-center bg-surface">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Closed Job Card 2 -->
+<div class="bg-surface-container-low border border-outline-variant/60 rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+<div class="flex justify-between items-start">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-container text-on-secondary-container">
+                            Yopiq
+                        </span>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="flex-1">
+<h3 class="font-section-title text-section-title text-on-surface mb-1">Sport kostyumlar</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2">"Olimpiya" zaxiralari kolleji uchun maxsus buyurtma. 450 to'plam.</p>
+</div>
+<div class="pt-4 border-t border-outline-variant/40 flex flex-col gap-3">
+<div class="flex items-center gap-2 text-on-surface-variant text-sm">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>2024-11-05</span>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-surface-container-highest text-on-surface-variant px-3 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-50" disabled="">
+                                Yopilgan
+                            </button>
+<button class="px-3 py-2 rounded-lg border border-outline-variant text-error hover:bg-error/5 transition-colors flex items-center justify-center bg-surface">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

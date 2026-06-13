@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<html class="light" lang="uz"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SFA Tailoring - Davomat</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-background": "#151c27",
+                    "surface-variant": "#dce2f3",
+                    "surface-container-high": "#e2e8f8",
+                    "on-tertiary-fixed": "#360f00",
+                    "tertiary": "#943700",
+                    "on-secondary-fixed": "#141b2b",
+                    "surface-container": "#e7eefe",
+                    "on-primary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#dbe1ff",
+                    "surface-container-highest": "#dce2f3",
+                    "surface-bright": "#f9f9ff",
+                    "secondary-container": "#d9dff5",
+                    "primary": "#004ac6",
+                    "secondary-fixed": "#dce2f7",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#00174b",
+                    "inverse-primary": "#b4c5ff",
+                    "tertiary-fixed-dim": "#ffb596",
+                    "on-secondary-container": "#5c6274",
+                    "error": "#ba1a1a",
+                    "outline": "#737686",
+                    "on-secondary-fixed-variant": "#404758",
+                    "on-surface-variant": "#434655",
+                    "inverse-on-surface": "#ebf1ff",
+                    "on-error-container": "#93000a",
+                    "on-surface": "#151c27",
+                    "tertiary-container": "#bc4800",
+                    "surface-tint": "#0053db",
+                    "secondary": "#575e70",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed": "#ffdbcd",
+                    "on-tertiary-container": "#ffede6",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#d3daea",
+                    "secondary-fixed-dim": "#c0c6db",
+                    "surface": "#f9f9ff",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "outline-variant": "#c3c6d7",
+                    "inverse-surface": "#2a313d",
+                    "on-primary-container": "#eeefff",
+                    "on-tertiary-fixed-variant": "#7d2d00",
+                    "primary-container": "#2563eb",
+                    "error-container": "#ffdad6",
+                    "background": "#f9f9ff",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "surface-container-low": "#f0f3ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "grid-gutter": "20px",
+                    "sidebar-width": "280px",
+                    "container-padding": "24px",
+                    "element-gap": "16px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "stat-display": ["Inter"],
+                    "table-header": ["Inter"],
+                    "body-main": ["Inter"],
+                    "section-title": ["Inter"],
+                    "page-title": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                    "stat-display": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "table-header": ["13px", { "lineHeight": "18px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                    "body-main": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                    "section-title": ["18px", { "lineHeight": "28px", "fontWeight": "600" }],
+                    "page-title": ["24px", { "lineHeight": "32px", "fontWeight": "700" }]
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-main antialiased min-h-screen flex">
+<!-- SideNavBar (Shared Component) -->
+<nav class="fixed left-0 top-0 h-full w-[280px] bg-on-background border-r border-outline-variant hidden md:flex flex-col py-6 z-20">
+<!-- Header -->
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+<span class="font-page-title text-page-title text-on-primary">S</span>
+</div>
+<div>
+<h1 class="font-page-title text-page-title text-on-primary">SFA Tailoring</h1>
+</div>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<ul class="flex flex-col w-full font-body-main text-body-main">
+<!-- Dashboard (Inactive) -->
+<li class="flex items-center gap-4 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5 transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Asosiy panel</span>
+</li>
+<!-- Jobs (Inactive) -->
+<li class="flex items-center gap-4 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5 transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span>Ishlar</span>
+</li>
+<!-- Tasks (Inactive) -->
+<li class="flex items-center gap-4 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5 transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span>Vazifalar</span>
+</li>
+<!-- Incoming (Inactive) -->
+<li class="flex items-center gap-4 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5 transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+<span>Kirim</span>
+</li>
+<!-- Outgoing (Inactive) -->
+<li class="flex items-center gap-4 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5 transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="upload">upload</span>
+<span>Chiqim</span>
+</li>
+<!-- Revenue (Inactive) -->
+<li class="flex items-center gap-4 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5 transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span>Daromad</span>
+</li>
+<!-- Expenses (Inactive) -->
+<li class="flex items-center gap-4 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5 transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span>Xarajatlar</span>
+</li>
+<!-- Operations (Inactive) -->
+<li class="flex items-center gap-4 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5 transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="settings_applications">settings_applications</span>
+<span>Amaliyotlar</span>
+</li>
+<!-- Attendance (ACTIVE) -->
+<li class="flex items-center gap-4 px-6 py-3 border-l-2 border-primary bg-white/10 text-on-primary font-semibold hover:bg-white/5 transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="calendar_today" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span>Davomat</span>
+</li>
+<!-- Payroll (Inactive) -->
+<li class="flex items-center gap-4 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5 transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span>Ish haqi</span>
+</li>
+<!-- Users (Inactive) -->
+<li class="flex items-center gap-4 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5 transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>Foydalanuvchilar</span>
+</li>
+<!-- Reports (Inactive) -->
+<li class="flex items-center gap-4 px-6 py-3 text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5 transition-colors cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span>Hisobotlar</span>
+</li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col md:ml-[280px] min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="sticky top-0 w-full bg-surface border-b border-outline-variant flex items-center justify-between px-grid-gutter h-16 z-10">
+<!-- Brand / Search Area -->
+<div class="flex items-center gap-4">
+<button class="md:hidden w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-all active:scale-95 duration-150">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h2 class="font-page-title text-page-title text-primary">SFA Tailoring</h2>
+</div>
+<!-- Actions & Profile -->
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-all active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-all active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-all active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant ml-2">
+<img alt="Manager Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a confident male factory manager wearing a crisp white collared shirt, set against a bright, modern office background with soft natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB80MsgFK2pq4TArtu6AF-O9MjHwNPcf-x9e8UjADa4nPVpbkUJ07jJhJYKvI3VbP2q2k73LewtUfY1s9gqwHw6ZuehXHCYg3QJCf4Az75t5I-_gP0ztrRI6WS4iiZWjK1rzamZQDj9FwdN-2wy3RZyHN_7HDfCzZvDkpw--wFHqF6yAiDvX6AA0PMcfB7oEo8CQwnHak5utQyf32qd4l9rmRR-jlQ1j7MT5JKvxnaBnI_sEiI7hQi2"/>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 p-container-padding flex flex-col gap-element-gap">
+<!-- Page Header -->
+<div class="flex items-center justify-between">
+<h1 class="font-page-title text-page-title text-on-surface">Davomat</h1>
+</div>
+<!-- Filter Panel -->
+<div class="bg-surface border border-outline-variant rounded-lg p-4 flex flex-wrap gap-4 items-end shadow-sm">
+<div class="flex flex-col gap-1 flex-1 min-w-[200px]">
+<label class="font-label-sm text-label-sm text-secondary">Ishchi tanlash</label>
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-3 py-2 bg-surface-container-lowest border border-outline-variant rounded text-body-main font-body-main text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Ism yoki ID kiriting..." type="text"/>
+</div>
+</div>
+<div class="flex flex-col gap-1 flex-1 min-w-[200px]">
+<label class="font-label-sm text-label-sm text-secondary">Sana tanlash</label>
+<input class="w-full px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded text-body-main font-body-main text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" type="date"/>
+</div>
+<div class="flex gap-3 mt-4 md:mt-0">
+<button class="h-[40px] px-4 bg-surface-container-lowest border border-outline-variant rounded text-on-surface font-label-sm text-label-sm hover:bg-surface-container-low transition-colors flex items-center justify-center">
+                        Tozalash
+                    </button>
+<button class="h-[40px] px-6 bg-primary border border-primary rounded text-on-primary font-label-sm text-label-sm hover:bg-primary-container transition-colors flex items-center justify-center shadow-sm">
+                        Qidirish
+                    </button>
+</div>
+</div>
+<!-- Attendance Cards Container -->
+<div class="flex flex-col gap-4 mt-2">
+<!-- Card: Today (Expanded) -->
+<div class="bg-surface rounded-lg border border-outline-variant overflow-hidden shadow-sm">
+<!-- Header -->
+<div class="flex justify-between items-center p-4 bg-surface border-b border-outline-variant cursor-pointer hover:bg-surface-container-lowest transition-colors" onclick="toggleAccordion('today-content', 'today-icon')">
+<div class="flex items-center gap-4">
+<h3 class="font-section-title text-section-title text-on-surface">13 Yanvar 2025, Dushanba</h3>
+<span class="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full font-label-sm text-label-sm uppercase tracking-wide">BUGUN</span>
+<span class="text-secondary font-body-main text-body-main ml-2">8 yozuv</span>
+</div>
+<span class="material-symbols-outlined text-secondary transition-transform duration-200" id="today-icon">expand_less</span>
+</div>
+<!-- Table Content -->
+<div class="overflow-x-auto block" id="today-content">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant font-table-header text-table-header text-on-surface-variant uppercase">
+<tr>
+<th class="py-3 px-4 font-semibold">Ism</th>
+<th class="py-3 px-4 font-semibold">Holat</th>
+<th class="py-3 px-4 font-semibold">Keldi vaqti</th>
+<th class="py-3 px-4 font-semibold">Ketti vaqti</th>
+<th class="py-3 px-4 font-semibold">Davomiyligi</th>
+<th class="py-3 px-4 font-semibold text-right">Harakat</th>
+</tr>
+</thead>
+<tbody class="font-body-main text-body-main text-on-surface">
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
+<td class="py-3 px-4 font-medium">Rustamov Azamat</td>
+<td class="py-3 px-4"><span class="bg-primary-fixed text-on-primary-fixed px-2.5 py-0.5 rounded-full font-label-sm text-label-sm">Kelgan</span></td>
+<td class="py-3 px-4">07:55</td>
+<td class="py-3 px-4 text-outline">-</td>
+<td class="py-3 px-4 text-outline">-</td>
+<td class="py-3 px-4 text-right">
+<button class="text-secondary hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
+<td class="py-3 px-4 font-medium">Karimova Nilufar</td>
+<td class="py-3 px-4"><span class="bg-primary-fixed text-on-primary-fixed px-2.5 py-0.5 rounded-full font-label-sm text-label-sm">Kelgan</span></td>
+<td class="py-3 px-4">08:02</td>
+<td class="py-3 px-4 text-outline">-</td>
+<td class="py-3 px-4 text-outline">-</td>
+<td class="py-3 px-4 text-right">
+<button class="text-secondary hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
+<td class="py-3 px-4 font-medium">Abdullayev Jasur</td>
+<td class="py-3 px-4"><span class="bg-error-container text-on-error-container px-2.5 py-0.5 rounded-full font-label-sm text-label-sm">Kelmagan</span></td>
+<td class="py-3 px-4 text-outline">-</td>
+<td class="py-3 px-4 text-outline">-</td>
+<td class="py-3 px-4 text-outline">-</td>
+<td class="py-3 px-4 text-right">
+<button class="text-secondary hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="py-3 px-4 font-medium">Toshmatov G'ayrat</td>
+<td class="py-3 px-4"><span class="bg-tertiary-fixed text-on-tertiary-fixed px-2.5 py-0.5 rounded-full font-label-sm text-label-sm">Qisman</span></td>
+<td class="py-3 px-4">09:15</td>
+<td class="py-3 px-4 text-outline">-</td>
+<td class="py-3 px-4 text-outline">-</td>
+<td class="py-3 px-4 text-right">
+<button class="text-secondary hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Card: Past Day 1 (Collapsed) -->
+<div class="bg-surface rounded-lg border border-outline-variant overflow-hidden shadow-sm">
+<!-- Header -->
+<div class="flex justify-between items-center p-4 bg-surface border-b border-transparent cursor-pointer hover:bg-surface-container-lowest transition-colors" onclick="toggleAccordion('past1-content', 'past1-icon')">
+<div class="flex items-center gap-4">
+<h3 class="font-section-title text-section-title text-on-surface">11 Yanvar 2025, Shanba</h3>
+<span class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full font-label-sm text-label-sm uppercase tracking-wide">O'TGAN KUN</span>
+<span class="text-secondary font-body-main text-body-main ml-2">45 yozuv</span>
+</div>
+<span class="material-symbols-outlined text-secondary transition-transform duration-200" id="past1-icon">expand_more</span>
+</div>
+<!-- Table Content (Hidden by default) -->
+<div class="hidden overflow-x-auto border-t border-outline-variant" id="past1-content">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant font-table-header text-table-header text-on-surface-variant uppercase">
+<tr>
+<th class="py-3 px-4 font-semibold">Ism</th>
+<th class="py-3 px-4 font-semibold">Holat</th>
+<th class="py-3 px-4 font-semibold">Keldi vaqti</th>
+<th class="py-3 px-4 font-semibold">Ketti vaqti</th>
+<th class="py-3 px-4 font-semibold">Davomiyligi</th>
+<th class="py-3 px-4 font-semibold text-right">Harakat</th>
+</tr>
+</thead>
+<tbody class="font-body-main text-body-main text-on-surface">
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
+<td class="py-3 px-4 font-medium">Rustamov Azamat</td>
+<td class="py-3 px-4"><span class="bg-primary-fixed text-on-primary-fixed px-2.5 py-0.5 rounded-full font-label-sm text-label-sm">Kelgan</span></td>
+<td class="py-3 px-4">07:58</td>
+<td class="py-3 px-4">18:05</td>
+<td class="py-3 px-4">10.1 soat</td>
+<td class="py-3 px-4 text-right">
+<button class="text-secondary hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="py-3 px-4 font-medium">Karimova Nilufar</td>
+<td class="py-3 px-4"><span class="bg-primary-fixed text-on-primary-fixed px-2.5 py-0.5 rounded-full font-label-sm text-label-sm">Kelgan</span></td>
+<td class="py-3 px-4">08:00</td>
+<td class="py-3 px-4">17:00</td>
+<td class="py-3 px-4">9.0 soat</td>
+<td class="py-3 px-4 text-right">
+<button class="text-secondary hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="p-3 bg-surface-container-lowest text-center border-t border-outline-variant">
+<button class="text-primary font-label-sm text-label-sm hover:underline">Barcha 45 yozuvni ko'rish</button>
+</div>
+</div>
+</div>
+<!-- Card: Past Day 2 (Collapsed) -->
+<div class="bg-surface rounded-lg border border-outline-variant overflow-hidden shadow-sm">
+<!-- Header -->
+<div class="flex justify-between items-center p-4 bg-surface border-b border-transparent cursor-pointer hover:bg-surface-container-lowest transition-colors" onclick="toggleAccordion('past2-content', 'past2-icon')">
+<div class="flex items-center gap-4">
+<h3 class="font-section-title text-section-title text-on-surface">10 Yanvar 2025, Juma</h3>
+<span class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full font-label-sm text-label-sm uppercase tracking-wide">O'TGAN KUN</span>
+<span class="text-secondary font-body-main text-body-main ml-2">46 yozuv</span>
+</div>
+<span class="material-symbols-outlined text-secondary transition-transform duration-200" id="past2-icon">expand_more</span>
+</div>
+<!-- Table Content (Hidden by default) -->
+<div class="hidden overflow-x-auto border-t border-outline-variant" id="past2-content">
+<div class="p-8 text-center text-secondary font-body-main text-body-main">
+                             Tafsilotlarni ko'rish uchun oching.
+                         </div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Accordion Script -->
+<script>
+        function toggleAccordion(contentId, iconId) {
+            const content = document.getElementById(contentId);
+            const icon = document.getElementById(iconId);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.textContent = 'expand_less';
+            } else {
+                content.classList.add('hidden');
+                icon.textContent = 'expand_more';
+            }
+        }
+    </script>
+</body></html>

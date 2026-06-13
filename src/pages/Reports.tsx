@@ -129,7 +129,7 @@ const Reports = () => {
     <Layout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Hisobotlar</h1>
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Hisobotlar</h1>
           <p className="text-muted-foreground">Umumiy statistika va daromadlar</p>
         </div>
 

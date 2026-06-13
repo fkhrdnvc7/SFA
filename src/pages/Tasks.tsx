@@ -256,7 +256,7 @@ const Tasks = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Vazifa berish</h1>
+            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Vazifa berish</h1>
             <p className="text-muted-foreground">Tikuvchilarga kunlik vazifalar berish</p>
           </div>
           <Dialog open={open} onOpenChange={(isOpen) => { setOpen(isOpen); if (!isOpen) resetForm(); }}>

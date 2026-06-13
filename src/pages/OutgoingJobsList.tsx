@@ -86,7 +86,7 @@ const OutgoingJobsList = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Ketgan ishlar</h1>
+            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Ketgan ishlar</h1>
             <p className="text-muted-foreground">Ishxonadan ketgan ishlar ro'yxati</p>
           </div>
         </div>

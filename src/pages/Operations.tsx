@@ -363,7 +363,7 @@ const Operations = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Operatsiyalar</h1>
+            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Operatsiyalar</h1>
             <p className="text-muted-foreground">Tikuv operatsiyalari va kategoriyalarini boshqarish</p>
           </div>
           <Dialog open={openCategoryDialog} onOpenChange={(isOpen) => {

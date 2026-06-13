@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+
+<html lang="uz"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SFA Tailoring - Hisobotlar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#141b2b",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#ebf1ff",
+                        "primary-container": "#2563eb",
+                        "surface-container": "#e7eefe",
+                        "tertiary": "#943700",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#d9dff5",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-variant": "#dce2f3",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "on-secondary-fixed-variant": "#404758",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-tint": "#0053db",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#bc4800",
+                        "surface-container-highest": "#dce2f3",
+                        "on-tertiary-container": "#ffede6",
+                        "secondary-fixed": "#dce2f7",
+                        "on-surface-variant": "#434655",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f9f9ff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#360f00",
+                        "inverse-surface": "#2a313d",
+                        "secondary-fixed-dim": "#c0c6db",
+                        "surface-container-high": "#e2e8f8",
+                        "primary": "#004ac6",
+                        "surface-dim": "#d3daea",
+                        "secondary": "#575e70",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#151c27",
+                        "outline-variant": "#c3c6d7",
+                        "primary-fixed": "#dbe1ff",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "surface": "#f9f9ff",
+                        "outline": "#737686",
+                        "on-secondary-container": "#5c6274",
+                        "on-primary-fixed": "#00174b",
+                        "background": "#f9f9ff",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdbcd",
+                        "on-primary-container": "#eeefff",
+                        "on-surface": "#151c27",
+                        "surface-container-low": "#f0f3ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "element-gap": "16px",
+                        "grid-gutter": "20px",
+                        "container-padding": "24px",
+                        "sidebar-width": "280px"
+                    },
+                    "fontFamily": {
+                        "section-title": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-main": ["Inter"],
+                        "table-header": ["Inter"],
+                        "stat-display": ["Inter"],
+                        "page-title": ["Inter"]
+                    },
+                    "fontSize": {
+                        "section-title": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-main": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "table-header": ["13px", {"lineHeight": "18px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "stat-display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "page-title": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex h-screen overflow-hidden">
+<!-- Shared SideNavBar -->
+<nav class="fixed left-0 top-0 h-full w-[280px] bg-on-secondary-fixed dark:bg-on-secondary-fixed border-r border-outline-variant flex flex-col overflow-y-auto hidden md:flex z-50">
+<div class="p-6 border-b border-white/10">
+<h1 class="font-page-title text-page-title text-surface-bright">SFA Tailoring</h1>
+</div>
+<ul class="flex-1 py-4 flex flex-col gap-1 px-3">
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-main text-body-main">Boshqaruv paneli</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-body-main text-body-main">Ishlar</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="task">task</span>
+<span class="font-body-main text-body-main">Vazifalar</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="input">input</span>
+<span class="font-body-main text-body-main">Kirim</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="output">output</span>
+<span class="font-body-main text-body-main">Chiqim</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-body-main text-body-main">Daromad</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-body-main text-body-main">Xarajatlar</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings_applications">settings_applications</span>
+<span class="font-body-main text-body-main">Operatsiyalar</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="fingerprint">fingerprint</span>
+<span class="font-body-main text-body-main">Davomat</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-body-main text-body-main">Ish haqi</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-body-main text-body-main">Foydalanuvchilar</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT border-l-4 border-primary bg-white/10 text-white font-semibold opacity-90 scale-95 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span class="font-body-main text-body-main">Hisobotlar</span>
+</a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-0 md:ml-[280px] flex flex-col h-screen relative">
+<!-- Shared TopNavBar -->
+<header class="bg-surface dark:bg-surface-container-low border-b border-outline-variant flex justify-between items-center px-6 py-4 w-full h-16 sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<div class="relative hidden sm:block w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="w-full bg-surface-container-highest border-none rounded-full py-2 pl-10 pr-4 font-body-main text-body-main text-on-surface placeholder:text-on-surface-variant focus:ring-2 focus:ring-primary/20 outline-none" placeholder="Qidiruv..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-element-gap">
+<button class="text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-all relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-section-title text-section-title ml-2 overflow-hidden border border-outline-variant cursor-pointer">
+<img alt="Foydalanuvchi profili" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXmppkiwD01SnKiK7iIZuSVXoAAclN1WFC2svtUtrMFBGfRRTZOwsotkbi2qOd15iW1oZPNiF-SAViWmqBc5duKbPBrI85huHOfCgYjwYHl33EOqTpmBfTVAHguyW7EZa-oRkWAAHfzG_MS8fSZDKoJMkds2PRle64mVgSQhWeVhdZS28bLVXI1sMf-T8BILEL-LsrLzGaYWnlN0ThcJ-S_01whk98uFTcqTlZk91u9wBlQwUBdl9g"/>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 overflow-y-auto p-container-padding bg-background">
+<!-- Header Section -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-grid-gutter">
+<h2 class="font-page-title text-page-title text-on-surface">Hisobotlar</h2>
+<div class="flex flex-wrap items-center gap-3">
+<div class="relative">
+<select class="appearance-none bg-surface border border-outline-variant rounded-DEFAULT py-2 pl-4 pr-10 font-body-main text-body-main text-on-surface focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer hover:bg-surface-container-highest transition-colors">
+<option>Ushbu oy</option>
+<option>Oxirgi 30 kun</option>
+<option>Maxsus muddat</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-sm" data-icon="expand_more">expand_more</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface border border-outline-variant rounded-DEFAULT text-on-surface font-label-sm text-label-sm hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="picture_as_pdf">picture_as_pdf</span>
+                            PDF
+                        </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-DEFAULT font-label-sm text-label-sm hover:opacity-90 transition-opacity shadow-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+                            Excel
+                        </button>
+</div>
+</div>
+</div>
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-grid-gutter mb-grid-gutter">
+<!-- Total Production -->
+<div class="bg-surface p-5 rounded-lg border border-outline-variant shadow-sm flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary">Jami ishlab chiqarish</span>
+<div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-600 text-[18px]" data-icon="inventory_2">inventory_2</span>
+</div>
+</div>
+<div class="font-stat-display text-stat-display text-on-surface">12,450</div>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-green-600 text-[14px]" data-icon="trending_up">trending_up</span>
+<span class="font-label-sm text-label-sm text-green-700">+8.2% <span class="text-secondary font-normal ml-1">o'tgan oyga nisbatan</span></span>
+</div>
+</div>
+<!-- Total Revenue -->
+<div class="bg-surface p-5 rounded-lg border border-outline-variant shadow-sm flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary">Umumiy tushum</span>
+<div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-600 text-[18px]" data-icon="payments">payments</span>
+</div>
+</div>
+<div class="font-stat-display text-stat-display text-on-surface">485.2M <span class="text-section-title text-secondary font-normal">UZS</span></div>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-green-600 text-[14px]" data-icon="trending_up">trending_up</span>
+<span class="font-label-sm text-label-sm text-green-700">+15.4% <span class="text-secondary font-normal ml-1">o'tgan oyga nisbatan</span></span>
+</div>
+</div>
+<!-- Total Expenses -->
+<div class="bg-surface p-5 rounded-lg border border-outline-variant shadow-sm flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary">Umumiy xarajatlar</span>
+<div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-600 text-[18px]" data-icon="outbox">outbox</span>
+</div>
+</div>
+<div class="font-stat-display text-stat-display text-on-surface">210.5M <span class="text-section-title text-secondary font-normal">UZS</span></div>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-red-600 text-[14px]" data-icon="trending_down">trending_down</span>
+<span class="font-label-sm text-label-sm text-red-700">-2.1% <span class="text-secondary font-normal ml-1">o'tgan oyga nisbatan</span></span>
+</div>
+</div>
+<!-- Net Profit -->
+<div class="bg-surface p-5 rounded-lg border border-outline-variant shadow-sm flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary">Sof foyda</span>
+<div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-indigo-600 text-[18px]" data-icon="account_balance">account_balance</span>
+</div>
+</div>
+<div class="font-stat-display text-stat-display text-on-surface">274.7M <span class="text-section-title text-secondary font-normal">UZS</span></div>
+<div class="flex items-center gap-1 mt-1">
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-label-sm text-label-sm inline-flex items-center gap-1">
+                            A'lo ko'rsatkich
+                        </span>
+</div>
+</div>
+</div>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-grid-gutter mb-grid-gutter">
+<!-- Production Efficiency Bar Chart (Mocked with CSS) -->
+<div class="bg-surface rounded-lg border border-outline-variant shadow-sm p-6 flex flex-col">
+<h3 class="font-section-title text-section-title text-on-surface mb-6">Ishlab chiqarish samaradorligi</h3>
+<div class="flex-1 flex items-end gap-4 h-[250px] mt-auto">
+<!-- Bars -->
+<div class="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-full flex items-end relative overflow-hidden">
+<div class="w-full bg-primary/80 group-hover:bg-primary transition-all duration-300 rounded-t-sm" style="height: 85%;"></div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-on-surface/10 rounded-t-sm backdrop-blur-[1px]">
+<span class="bg-surface px-2 py-1 rounded text-xs font-bold shadow-md">4,250</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-secondary truncate max-w-full" title="Maktab formasi">Maktab f...</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-full flex items-end relative overflow-hidden">
+<div class="w-full bg-primary/60 group-hover:bg-primary/80 transition-all duration-300 rounded-t-sm" style="height: 60%;"></div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-on-surface/10 rounded-t-sm backdrop-blur-[1px]">
+<span class="bg-surface px-2 py-1 rounded text-xs font-bold shadow-md">3,000</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-secondary truncate max-w-full" title="Kurtkalar">Kurtkalar</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-full flex items-end relative overflow-hidden">
+<div class="w-full bg-primary/40 group-hover:bg-primary/60 transition-all duration-300 rounded-t-sm" style="height: 45%;"></div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-on-surface/10 rounded-t-sm backdrop-blur-[1px]">
+<span class="bg-surface px-2 py-1 rounded text-xs font-bold shadow-md">2,250</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-secondary truncate max-w-full" title="Kostyumlar">Kostyumlar</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-full flex items-end relative overflow-hidden">
+<div class="w-full bg-primary/30 group-hover:bg-primary/50 transition-all duration-300 rounded-t-sm" style="height: 30%;"></div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-on-surface/10 rounded-t-sm backdrop-blur-[1px]">
+<span class="bg-surface px-2 py-1 rounded text-xs font-bold shadow-md">1,500</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-secondary truncate max-w-full" title="Shimlar">Shimlar</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-full bg-surface-container-highest rounded-t-sm h-full flex items-end relative overflow-hidden">
+<div class="w-full bg-primary/20 group-hover:bg-primary/40 transition-all duration-300 rounded-t-sm" style="height: 25%;"></div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-on-surface/10 rounded-t-sm backdrop-blur-[1px]">
+<span class="bg-surface px-2 py-1 rounded text-xs font-bold shadow-md">1,450</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-secondary truncate max-w-full" title="Ko'ylaklar">Ko'ylaklar</span>
+</div>
+</div>
+</div>
+<!-- Financial Balance Line Chart (Mocked with SVG) -->
+<div class="bg-surface rounded-lg border border-outline-variant shadow-sm p-6 flex flex-col relative overflow-hidden">
+<h3 class="font-section-title text-section-title text-on-surface mb-2 z-10 relative">Moliya balansi</h3>
+<div class="flex items-center gap-4 mb-4 z-10 relative">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-green-500"></div>
+<span class="font-label-sm text-label-sm text-secondary">Tushum</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-red-400"></div>
+<span class="font-label-sm text-label-sm text-secondary">Xarajat</span>
+</div>
+</div>
+<div class="flex-1 w-full h-[200px] relative z-0">
+<!-- Decorative SVG Line Chart -->
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 500 200">
+<!-- Grid lines -->
+<line stroke="#E5E7EB" stroke-dasharray="4" stroke-width="1" x1="0" x2="500" y1="50" y2="50"></line>
+<line stroke="#E5E7EB" stroke-dasharray="4" stroke-width="1" x1="0" x2="500" y1="100" y2="100"></line>
+<line stroke="#E5E7EB" stroke-dasharray="4" stroke-width="1" x1="0" x2="500" y1="150" y2="150"></line>
+<!-- Expenses Line (Red) -->
+<path d="M0,160 Q50,150 100,170 T200,140 T300,160 T400,130 T500,140" fill="none" stroke="#F87171" stroke-width="3"></path>
+<!-- Revenue Line (Green) -->
+<path d="M0,120 Q50,90 100,100 T200,60 T300,80 T400,30 T500,40" fill="none" stroke="#10B981" stroke-width="3"></path>
+<!-- Revenue Gradient Area -->
+<path d="M0,120 Q50,90 100,100 T200,60 T300,80 T400,30 T500,40 L500,200 L0,200 Z" fill="url(#greenGrad)" opacity="0.2"></path>
+<defs>
+<lineargradient id="greenGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#10B981"></stop>
+<stop offset="100%" stop-color="transparent"></stop>
+</lineargradient>
+</defs>
+</svg>
+<!-- X-Axis Labels -->
+<div class="absolute bottom-[-20px] left-0 w-full flex justify-between px-2 font-label-sm text-label-sm text-secondary">
+<span>1-Sht</span>
+<span>8-Sht</span>
+<span>15-Sht</span>
+<span>22-Sht</span>
+<span>30-Sht</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Detailed Tables & Lists -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-grid-gutter">
+<!-- Top Ordered Products Table -->
+<div class="lg:col-span-2 bg-surface rounded-lg border border-outline-variant shadow-sm overflow-hidden flex flex-col">
+<div class="p-5 border-b border-outline-variant flex justify-between items-center bg-surface-bright">
+<h3 class="font-section-title text-section-title text-on-surface">Eng ko'p buyurtma berilgan mahsulotlar</h3>
+<button class="text-primary hover:text-primary-fixed-dim font-label-sm text-label-sm font-semibold transition-colors">Barchasini ko'rish</button>
+</div>
+<div class="overflow-x-auto flex-1">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#F9FAFB] border-b border-outline-variant">
+<th class="py-3 px-5 font-table-header text-table-header text-on-surface-variant w-1/2">Mahsulot nomi</th>
+<th class="py-3 px-5 font-table-header text-table-header text-on-surface-variant text-right">Miqdor (dona)</th>
+<th class="py-3 px-5 font-table-header text-table-header text-on-surface-variant text-right">Tushum (UZS)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-outline-variant/50 hover:bg-[#F3F4F6] transition-colors group">
+<td class="py-3 px-5 font-body-main text-body-main text-on-surface flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="apparel">apparel</span>
+</div>
+                                        Maktab formasi (O'g'il bolalar)
+                                    </td>
+<td class="py-3 px-5 font-body-main text-body-main text-on-surface text-right">2,500</td>
+<td class="py-3 px-5 font-body-main text-body-main text-on-surface text-right font-medium">125.0M</td>
+</tr>
+<tr class="border-b border-outline-variant/50 hover:bg-[#F3F4F6] transition-colors group">
+<td class="py-3 px-5 font-body-main text-body-main text-on-surface flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="apparel">apparel</span>
+</div>
+                                        Maktab formasi (Qiz bolalar)
+                                    </td>
+<td class="py-3 px-5 font-body-main text-body-main text-on-surface text-right">1,750</td>
+<td class="py-3 px-5 font-body-main text-body-main text-on-surface text-right font-medium">87.5M</td>
+</tr>
+<tr class="border-b border-outline-variant/50 hover:bg-[#F3F4F6] transition-colors group">
+<td class="py-3 px-5 font-body-main text-body-main text-on-surface flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="dry_cleaning">dry_cleaning</span>
+</div>
+                                        Kuzgi kurtka (Erkaklar)
+                                    </td>
+<td class="py-3 px-5 font-body-main text-body-main text-on-surface text-right">1,200</td>
+<td class="py-3 px-5 font-body-main text-body-main text-on-surface text-right font-medium">180.0M</td>
+</tr>
+<tr class="hover:bg-[#F3F4F6] transition-colors group">
+<td class="py-3 px-5 font-body-main text-body-main text-on-surface flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="styler">styler</span>
+</div>
+                                        Klassik kostyum-shim
+                                    </td>
+<td class="py-3 px-5 font-body-main text-body-main text-on-surface text-right">850</td>
+<td class="py-3 px-5 font-body-main text-body-main text-on-surface text-right font-medium">170.0M</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Expense Breakdown List/Bento style -->
+<div class="bg-surface rounded-lg border border-outline-variant shadow-sm p-5 flex flex-col">
+<h3 class="font-section-title text-section-title text-on-surface mb-4">Xarajatlar tarkibi</h3>
+<div class="flex-1 flex flex-col gap-4">
+<!-- Category 1 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-blue-500"></div>
+<span class="font-body-main text-body-main text-on-surface">Xom-ashyo (Mato)</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-medium">45%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-blue-500 rounded-full" style="width: 45%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-right">94.7M UZS</span>
+</div>
+<!-- Category 2 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-amber-500"></div>
+<span class="font-body-main text-body-main text-on-surface">Ish haqi fontsi</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-medium">30%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-amber-500 rounded-full" style="width: 30%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-right">63.1M UZS</span>
+</div>
+<!-- Category 3 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-purple-500"></div>
+<span class="font-body-main text-body-main text-on-surface">Aksessuarlar (Ip, tugma)</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-medium">15%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-purple-500 rounded-full" style="width: 15%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-right">31.5M UZS</span>
+</div>
+<!-- Category 4 -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-teal-500"></div>
+<span class="font-body-main text-body-main text-on-surface">Kommunal va boshqa</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-medium">10%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-teal-500 rounded-full" style="width: 10%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-right">21.0M UZS</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+
+<html class="light" lang="uz"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SFA Tailoring - Bosh sahifa</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "secondary": "#575e70",
+                "on-primary-fixed": "#00174b",
+                "outline-variant": "#c3c6d7",
+                "tertiary-container": "#bc4800",
+                "inverse-primary": "#b4c5ff",
+                "on-surface": "#151c27",
+                "background": "#f9f9ff",
+                "primary": "#004ac6",
+                "inverse-on-surface": "#ebf1ff",
+                "error": "#ba1a1a",
+                "primary-fixed": "#dbe1ff",
+                "surface-container": "#e7eefe",
+                "surface": "#f9f9ff",
+                "on-background": "#151c27",
+                "surface-container-highest": "#dce2f3",
+                "surface-bright": "#f9f9ff",
+                "on-tertiary-container": "#ffede6",
+                "on-tertiary-fixed": "#360f00",
+                "on-tertiary": "#ffffff",
+                "on-secondary-fixed-variant": "#404758",
+                "tertiary": "#943700",
+                "surface-dim": "#d3daea",
+                "on-primary": "#ffffff",
+                "on-error-container": "#93000a",
+                "tertiary-fixed-dim": "#ffb596",
+                "primary-fixed-dim": "#b4c5ff",
+                "surface-container-high": "#e2e8f8",
+                "secondary-container": "#d9dff5",
+                "surface-container-lowest": "#ffffff",
+                "secondary-fixed": "#dce2f7",
+                "tertiary-fixed": "#ffdbcd",
+                "outline": "#737686",
+                "on-primary-container": "#eeefff",
+                "inverse-surface": "#2a313d",
+                "primary-container": "#2563eb",
+                "error-container": "#ffdad6",
+                "surface-tint": "#0053db",
+                "on-secondary-fixed": "#141b2b",
+                "on-primary-fixed-variant": "#003ea8",
+                "on-tertiary-fixed-variant": "#7d2d00",
+                "on-surface-variant": "#434655",
+                "on-error": "#ffffff",
+                "surface-container-low": "#f0f3ff",
+                "on-secondary": "#ffffff",
+                "secondary-fixed-dim": "#c0c6db",
+                "on-secondary-container": "#5c6274",
+                "surface-variant": "#dce2f3"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "container-padding": "24px",
+                "element-gap": "16px",
+                "sidebar-width": "280px",
+                "grid-gutter": "20px"
+        },
+        "fontFamily": {
+                "body-main": [
+                        "Inter"
+                ],
+                "stat-display": [
+                        "Inter"
+                ],
+                "page-title": [
+                        "Inter"
+                ],
+                "label-sm": [
+                        "Inter"
+                ],
+                "table-header": [
+                        "Inter"
+                ],
+                "section-title": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "body-main": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "stat-display": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "page-title": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "table-header": [
+                        "13px",
+                        {
+                                "lineHeight": "18px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "section-title": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-main text-body-main antialiased h-screen overflow-hidden flex">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col w-[280px] h-screen fixed left-0 top-0 bg-inverse-surface dark:bg-inverse-surface text-inverse-on-surface z-50">
+<!-- Header -->
+<div class="px-container-padding py-6 border-b border-white/10 flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center font-bold text-lg text-on-primary">
+                SFA
+            </div>
+<div>
+<h1 class="font-page-title text-page-title text-inverse-on-surface">SFA Tailoring</h1>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 overflow-y-auto py-4 flex flex-col gap-1 px-3">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg border-l-2 border-primary bg-on-surface/10 text-on-primary font-bold hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">apparel</span>
+<span>Ishlar</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span>Vazifalar</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">login</span>
+<span>Kirim</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Chiqim</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span>Daromad</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span>Xarajatlar</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">settings_applications</span>
+<span>Operatsiyalar</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">fingerprint</span>
+<span>Davomat</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span>Ish haqi</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Foydalanuvchilar</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span>Hisobotlar</span>
+</a>
+</nav>
+<!-- Footer Tabs -->
+<div class="p-3 border-t border-white/10 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span>Profile</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-primary-fixed hover:bg-primary/10 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-[280px] h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="sticky top-0 w-full z-40 bg-surface dark:bg-surface-dim border-b border-outline-variant flex justify-between items-center px-container-padding h-16">
+<!-- Mobile Menu Toggle -->
+<button class="md:hidden text-on-surface-variant hover:text-primary transition-all p-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<!-- Search (on_left) -->
+<div class="hidden sm:flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant focus-within:ring-2 focus-within:ring-primary/20 w-64 lg:w-96">
+<span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
+<input class="bg-transparent border-none outline-none w-full text-body-main placeholder-on-surface-variant/50 focus:ring-0 p-0" placeholder="Qidiruv..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<!-- Trailing Primary Action -->
+<button class="hidden sm:flex items-center gap-2 bg-primary-container text-on-primary px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-body-main font-medium">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+                    Yangi Buyurtma
+                </button>
+<!-- Icon Actions -->
+<button class="relative text-on-surface-variant hover:text-primary transition-all p-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-all p-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<!-- Profile Avatar -->
+<div class="w-9 h-9 rounded-full bg-primary-fixed-dim text-on-primary-fixed-variant flex items-center justify-center font-bold border border-outline-variant cursor-pointer">
+                    A
+                </div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 overflow-y-auto bg-background p-container-padding">
+<div class="max-w-7xl mx-auto space-y-element-gap">
+<!-- Page Header -->
+<div class="mb-6">
+<h2 class="font-page-title text-page-title text-on-surface mb-1">Bosh sahifa</h2>
+<p class="font-body-main text-on-surface-variant">Xush kelibsiz, Admin! Bugun 15-yanvar, 2025-yil</p>
+</div>
+<!-- Stats Grid (2x2) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-grid-gutter">
+<!-- Stat 1 -->
+<div class="bg-surface rounded-xl border border-outline-variant p-5 hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider mb-1">Jami Ishlar</p>
+<h3 class="font-stat-display text-stat-display text-on-surface">124 <span class="text-lg font-medium text-on-surface-variant">ta</span></h3>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">work</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 text-sm">
+<span class="material-symbols-outlined text-[16px] text-green-600">trending_up</span>
+<span class="text-green-600 font-medium">12% o'sish</span>
+<span class="text-secondary">o'tgan oydan</span>
+</div>
+</div>
+<!-- Stat 2 -->
+<div class="bg-surface rounded-xl border border-outline-variant p-5 hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider mb-1">Bajarilgan</p>
+<h3 class="font-stat-display text-stat-display text-on-surface">86 <span class="text-lg font-medium text-on-surface-variant">ta</span></h3>
+</div>
+<div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-600">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 text-sm">
+<span class="material-symbols-outlined text-[16px] text-green-600">trending_up</span>
+<span class="text-green-600 font-medium">5% o'sish</span>
+<span class="text-secondary">o'tgan oydan</span>
+</div>
+</div>
+<!-- Stat 3 -->
+<div class="bg-surface rounded-xl border border-outline-variant p-5 hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider mb-1">Kutilmoqda</p>
+<h3 class="font-stat-display text-stat-display text-on-surface">28 <span class="text-lg font-medium text-on-surface-variant">ta</span></h3>
+</div>
+<div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 text-sm">
+<span class="material-symbols-outlined text-[16px] text-red-600">trending_down</span>
+<span class="text-red-600 font-medium">2% kamayish</span>
+<span class="text-secondary">o'tgan oydan</span>
+</div>
+</div>
+<!-- Stat 4 -->
+<div class="bg-surface rounded-xl border border-outline-variant p-5 hover:shadow-sm transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider mb-1">Bugungi Daromad</p>
+<h3 class="font-stat-display text-[24px] leading-[32px] font-bold text-on-surface">4.5M <span class="text-lg font-medium text-on-surface-variant">so'm</span></h3>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 text-sm">
+<span class="material-symbols-outlined text-[16px] text-green-600">trending_up</span>
+<span class="text-green-600 font-medium">8% o'sish</span>
+<span class="text-secondary">kechagidan</span>
+</div>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="py-2 overflow-x-auto no-scrollbar">
+<div class="flex items-center gap-3 min-w-max">
+<button class="flex items-center gap-2 bg-surface border border-outline-variant text-on-surface px-4 py-2.5 rounded-lg hover:bg-surface-variant transition-colors font-body-main font-medium">
+<span class="material-symbols-outlined text-primary text-[20px]">add_box</span>
+                            Yangi Ish
+                        </button>
+<button class="flex items-center gap-2 bg-surface border border-outline-variant text-on-surface px-4 py-2.5 rounded-lg hover:bg-surface-variant transition-colors font-body-main font-medium">
+<span class="material-symbols-outlined text-primary text-[20px]">assignment_ind</span>
+                            Vazifa Berish
+                        </button>
+<button class="flex items-center gap-2 bg-surface border border-outline-variant text-on-surface px-4 py-2.5 rounded-lg hover:bg-surface-variant transition-colors font-body-main font-medium">
+<span class="material-symbols-outlined text-primary text-[20px]">fingerprint</span>
+                            Davomat Olish
+                        </button>
+<button class="flex items-center gap-2 bg-surface border border-outline-variant text-on-surface px-4 py-2.5 rounded-lg hover:bg-surface-variant transition-colors font-body-main font-medium">
+<span class="material-symbols-outlined text-primary text-[20px]">receipt_long</span>
+                            Xarajat Qo'shish
+                        </button>
+<button class="flex items-center gap-2 bg-surface border border-outline-variant text-on-surface px-4 py-2.5 rounded-lg hover:bg-surface-variant transition-colors font-body-main font-medium">
+<span class="material-symbols-outlined text-primary text-[20px]">download</span>
+                            Hisobot Yuklash
+                        </button>
+<button class="flex items-center gap-2 bg-surface border border-outline-variant text-on-surface px-4 py-2.5 rounded-lg hover:bg-surface-variant transition-colors font-body-main font-medium">
+<span class="material-symbols-outlined text-primary text-[20px]">account_balance_wallet</span>
+                            Maosh Hisoblash
+                        </button>
+</div>
+</div>
+<!-- Recent Activity Table -->
+<div class="bg-surface rounded-xl border border-outline-variant overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+<h3 class="font-section-title text-section-title text-on-surface">So'nggi Faoliyatlar</h3>
+<button class="text-primary hover:text-primary-fixed-variant text-sm font-medium transition-colors">Barchasini ko'rish</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant font-table-header text-table-header text-on-surface-variant uppercase tracking-wider">
+<th class="px-6 py-3 font-semibold">Ish nomi</th>
+<th class="px-6 py-3 font-semibold">Tikuvchi</th>
+<th class="px-6 py-3 font-semibold">Status</th>
+<th class="px-6 py-3 font-semibold">Sana</th>
+<th class="px-6 py-3 font-semibold text-right">Amallar</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-body-main text-body-main text-on-surface">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 font-medium">Ko'ylak tikish</td>
+<td class="px-6 py-4 text-on-surface-variant">Ali Valiyev</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                            Ochiq
+                                        </span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant">2025-01-15</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-variant rounded-md transition-colors" title="Tahrirlash">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-md transition-colors" title="O'chirish">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 font-medium">Shim tayyorlash</td>
+<td class="px-6 py-4 text-on-surface-variant">Otabek G'aniyev</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                            Bajarildi
+                                        </span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant">2025-01-14</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-variant rounded-md transition-colors" title="Tahrirlash">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-md transition-colors" title="O'chirish">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 font-medium">Kostyum bichish</td>
+<td class="px-6 py-4 text-on-surface-variant">Malika Rahmonova</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                                            Kutilmoqda
+                                        </span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant">2025-01-15</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-variant rounded-md transition-colors" title="Tahrirlash">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-md transition-colors" title="O'chirish">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

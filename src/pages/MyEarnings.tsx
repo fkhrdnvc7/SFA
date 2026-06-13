@@ -140,7 +140,7 @@ const MyEarnings = () => {
     <Layout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Mening daromadlarim</h1>
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Mening daromadlarim</h1>
           <p className="text-muted-foreground">Barcha ishlar va daromadlar</p>
         </div>
 

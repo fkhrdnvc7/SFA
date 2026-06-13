@@ -2,90 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* ==========================================================================
+   SFA Tailoring — Enterprise Design System
+   Corporate / Modern aesthetic adapted from the Stitch design.
+   Blue primary, light lavender canvas, dark slate sidebar.
+   All colors MUST be HSL.
+   ========================================================================== */
 
 @layer base {
   :root {
-    /* Black & White Monochrome Theme */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
+    /* Canvas & text */
+    --background: 240 100% 99%;        /* #f9f9ff */
+    --foreground: 218 30% 12%;         /* #151c27 */
 
-    --card: 0 0% 98%;
-    --card-foreground: 0 0% 10%;
+    /* Cards / surfaces */
+    --card: 0 0% 100%;                 /* white surface */
+    --card-foreground: 218 30% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover-foreground: 218 30% 12%;
 
-    --primary: 0 0% 10%;
-    --primary-foreground: 0 0% 98%;
+    /* Primary (action blue) */
+    --primary: 221 83% 53%;            /* #2563eb */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 95%;
-    --secondary-foreground: 0 0% 10%;
+    /* Secondary (soft blue container) */
+    --secondary: 226 56% 91%;          /* #d9dff5 */
+    --secondary-foreground: 222 14% 40%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    /* Muted / neutral surfaces */
+    --muted: 225 100% 97%;             /* #f0f3ff */
+    --muted-foreground: 230 12% 30%;   /* #434655 */
 
-    --accent: 0 0% 90%;
-    --accent-foreground: 0 0% 10%;
+    /* Accent (light blue container) */
+    --accent: 222 88% 95%;             /* #e7eefe */
+    --accent-foreground: 218 30% 12%;
 
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 98%;
+    /* Destructive */
+    --destructive: 0 75% 42%;          /* #ba1a1a */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: 0 0% 20%;
+    /* Lines & inputs */
+    --border: 228 26% 80%;             /* #c3c6d7 */
+    --input: 228 26% 80%;
+    --ring: 221 83% 53%;
 
-    --radius: 0.5rem;
+    /* 12px corporate radius */
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 20%;
-    --sidebar-primary: 0 0% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 0% 94%;
-    --sidebar-accent-foreground: 0 0% 10%;
-    --sidebar-border: 0 0% 88%;
-    --sidebar-ring: 0 0% 20%;
+    /* Semantic status (used by charts / inline styles) */
+    --success: 142 71% 40%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 48%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Sidebar — dark slate theme */
+    --sidebar-background: 220 39% 11%;     /* #111827 */
+    --sidebar-foreground: 218 22% 78%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 28% 18%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 18% 22%;
+    --sidebar-ring: 221 83% 53%;
   }
 
   .dark {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 95%;
+    --background: 222 32% 9%;
+    --foreground: 218 27% 92%;
 
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 95%;
+    --card: 222 28% 13%;
+    --card-foreground: 218 27% 92%;
 
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 222 28% 13%;
+    --popover-foreground: 218 27% 92%;
 
-    --primary: 0 0% 95%;
-    --primary-foreground: 0 0% 10%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 18%;
-    --secondary-foreground: 0 0% 95%;
+    --secondary: 222 22% 20%;
+    --secondary-foreground: 218 27% 92%;
 
-    --muted: 0 0% 18%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 222 22% 18%;
+    --muted-foreground: 220 12% 65%;
 
-    --accent: 0 0% 22%;
-    --accent-foreground: 0 0% 95%;
+    --accent: 222 22% 22%;
+    --accent-foreground: 218 27% 92%;
 
     --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 95%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 22%;
-    --input: 0 0% 22%;
-    --ring: 0 0% 80%;
-    
-    --sidebar-background: 0 0% 10%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 0 0% 95%;
-    --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 0 0% 18%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 22%;
-    --sidebar-ring: 0 0% 80%;
+    --border: 222 18% 24%;
+    --input: 222 18% 24%;
+    --ring: 217 91% 60%;
+
+    --success: 142 65% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 52%;
+    --warning-foreground: 0 0% 100%;
+
+    --sidebar-background: 222 35% 7%;
+    --sidebar-foreground: 218 22% 80%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 24% 16%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 222 18% 20%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
@@ -95,6 +118,32 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Page / section typography helpers */
+  .text-page-title {
+    @apply text-2xl font-bold tracking-tight leading-8;
+  }
+  .text-section-title {
+    @apply text-lg font-semibold leading-7;
+  }
+  .text-stat-display {
+    @apply text-3xl font-bold tracking-tight;
+  }
+  .text-table-header {
+    @apply text-xs font-semibold uppercase tracking-wider;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar for horizontal quick-action strips */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

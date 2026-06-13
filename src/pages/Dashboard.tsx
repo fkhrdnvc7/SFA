@@ -4,20 +4,74 @@ import { useAuth } from "@/lib/auth";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Briefcase, DollarSign, TrendingUp, ClipboardList, Receipt, Clock } from "lucide-react";
+import {
+  Briefcase,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  ClipboardList,
+  Receipt,
+  Clock,
+  CheckCircle2,
+  BarChart3,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface StatCardProps {
+  label: string;
+  value: string | number;
+  suffix?: string;
+  icon: typeof Briefcase;
+  tone?: "primary" | "success" | "warning" | "danger";
+  trend?: { value: string; up: boolean; note: string };
+}
+
+const toneClasses: Record<string, string> = {
+  primary: "bg-primary/10 text-primary",
+  success: "bg-emerald-500/10 text-emerald-600",
+  warning: "bg-amber-500/10 text-amber-600",
+  danger: "bg-red-500/10 text-red-600",
+};
+
+const StatCard = ({ label, value, suffix, icon: Icon, tone = "primary", trend }: StatCardProps) => (
+  <Card className="transition-shadow hover:shadow-sm">
+    <CardContent className="p-5">
+      <div className="mb-4 flex items-start justify-between">
+        <div>
+          <p className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            {label}
+          </p>
+          <h3 className="text-stat-display text-foreground">
+            {value}
+            {suffix && <span className="ml-1 text-lg font-medium text-muted-foreground">{suffix}</span>}
+          </h3>
+        </div>
+        <div className={cn("flex h-10 w-10 items-center justify-center rounded-full", toneClasses[tone])}>
+          <Icon className="h-5 w-5" />
+        </div>
+      </div>
+      {trend && (
+        <div className="flex items-center gap-1.5 text-sm">
+          {trend.up ? (
+            <TrendingUp className="h-4 w-4 text-emerald-600" />
+          ) : (
+            <TrendingDown className="h-4 w-4 text-red-600" />
+          )}
+          <span className={cn("font-medium", trend.up ? "text-emerald-600" : "text-red-600")}>
+            {trend.value}
+          </span>
+          <span className="text-muted-foreground">{trend.note}</span>
+        </div>
+      )}
+    </CardContent>
+  </Card>
+);
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
-  const [stats, setStats] = useState({
-    totalJobs: 0,
-    openJobs: 0,
-    totalEarnings: 0,
-  });
-  const [dailyStats, setDailyStats] = useState({
-    today: 0,
-    yesterday: 0,
-  });
+  const [stats, setStats] = useState({ totalJobs: 0, openJobs: 0, totalEarnings: 0 });
+  const [dailyStats, setDailyStats] = useState({ today: 0, yesterday: 0 });
 
   useEffect(() => {
     if (!loading && !user) {
@@ -33,39 +87,26 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      if (profile?.role === 'SEAMSTRESS') {
-        // Get seamstress stats
+      if (profile?.role === "SEAMSTRESS") {
         const { data: jobItems } = await supabase
-          .from('job_items')
-          .select('quantity, unit_price, bonus_amount')
-          .eq('seamstress_id', user?.id);
+          .from("job_items")
+          .select("quantity, unit_price, bonus_amount")
+          .eq("seamstress_id", user?.id);
 
-        const totalEarnings = jobItems?.reduce((sum, item) => {
-          return sum + (item.quantity * item.unit_price) + (item.bonus_amount || 0);
-        }, 0) || 0;
+        const totalEarnings =
+          jobItems?.reduce((sum, item) => {
+            return sum + item.quantity * item.unit_price + (item.bonus_amount || 0);
+          }, 0) || 0;
 
-        setStats({
-          totalJobs: jobItems?.length || 0,
-          openJobs: 0,
-          totalEarnings,
-        });
+        setStats({ totalJobs: jobItems?.length || 0, openJobs: 0, totalEarnings });
       } else {
-        // Get manager/admin stats
-        const { data: jobs } = await supabase
-          .from('jobs')
-          .select('*');
-
-        const openJobs = jobs?.filter(j => j.status === 'ochiq').length || 0;
-
-        setStats({
-          totalJobs: jobs?.length || 0,
-          openJobs,
-          totalEarnings: 0,
-        });
+        const { data: jobs } = await supabase.from("jobs").select("*");
+        const openJobs = jobs?.filter((j) => j.status === "ochiq").length || 0;
+        setStats({ totalJobs: jobs?.length || 0, openJobs, totalEarnings: 0 });
         fetchDailyComparison();
       }
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error("Error fetching stats:", error);
     }
   };
 
@@ -75,32 +116,33 @@ const Dashboard = () => {
       const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
       const startOfTomorrow = new Date(startOfToday);
       startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
-
       const startOfYesterday = new Date(startOfToday);
       startOfYesterday.setDate(startOfYesterday.getDate() - 1);
 
       const { count: todayCount } = await supabase
-        .from('job_items')
-        .select('id', { count: 'exact', head: true })
-        .gte('created_at', startOfToday.toISOString())
-        .lt('created_at', startOfTomorrow.toISOString());
+        .from("job_items")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", startOfToday.toISOString())
+        .lt("created_at", startOfTomorrow.toISOString());
 
       const { count: yesterdayCount } = await supabase
-        .from('job_items')
-        .select('id', { count: 'exact', head: true })
-        .gte('created_at', startOfYesterday.toISOString())
-        .lt('created_at', startOfToday.toISOString());
+        .from("job_items")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", startOfYesterday.toISOString())
+        .lt("created_at", startOfToday.toISOString());
 
-      setDailyStats({
-        today: todayCount || 0,
-        yesterday: yesterdayCount || 0,
-      });
+      setDailyStats({ today: todayCount || 0, yesterday: yesterdayCount || 0 });
     } catch (error) {
-      console.error('Error fetching daily comparison:', error);
+      console.error("Error fetching daily comparison:", error);
     }
   };
 
   const dailyDiff = dailyStats.today - dailyStats.yesterday;
+  const today = new Date().toLocaleDateString("uz-UZ", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
   if (loading) {
     return (
@@ -110,151 +152,103 @@ const Dashboard = () => {
     );
   }
 
+  const quickActions =
+    profile?.role === "SEAMSTRESS"
+      ? [
+          { label: "Vazifalarim", icon: ClipboardList, to: "/my-tasks" },
+          { label: "Daromadlarim", icon: DollarSign, to: "/my-earnings" },
+        ]
+      : [
+          ...(profile?.role === "ADMIN"
+            ? [{ label: "Davomat", icon: Clock, to: "/attendance" }]
+            : []),
+          { label: "Yangi ish", icon: Briefcase, to: "/jobs" },
+          { label: "Vazifa berish", icon: ClipboardList, to: "/tasks" },
+          { label: "Xarajatlar", icon: Receipt, to: "/expenses" },
+          { label: "Kelgan ish", icon: Briefcase, to: "/incoming-jobs" },
+          { label: "Daromad", icon: TrendingUp, to: "/revenue" },
+          { label: "Hisobotlar", icon: BarChart3, to: "/reports" },
+        ];
+
   return (
     <Layout>
       <div className="space-y-6">
+        {/* Page header */}
         <div>
-          <h1 className="text-3xl font-bold">Bosh sahifa</h1>
-          <p className="text-muted-foreground">Xush kelibsiz, {profile?.full_name}!</p>
+          <h1 className="text-page-title">Bosh sahifa</h1>
+          <p className="text-muted-foreground">
+            Xush kelibsiz, {profile?.full_name}! Bugun {today}
+          </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">
-                {profile?.role === 'SEAMSTRESS' ? 'Mening ishlarim' : 'Jami ishlar'}
-              </CardTitle>
-              <Briefcase className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalJobs}</div>
-            </CardContent>
-          </Card>
+        {/* Stats */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label={profile?.role === "SEAMSTRESS" ? "Mening ishlarim" : "Jami ishlar"}
+            value={stats.totalJobs}
+            suffix="ta"
+            icon={Briefcase}
+            tone="primary"
+          />
 
-          {profile?.role !== 'SEAMSTRESS' && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Ochiq ishlar</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.openJobs}</div>
-              </CardContent>
-            </Card>
-          )}
-          {profile?.role !== 'SEAMSTRESS' && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Bugungi ishlar</CardTitle>
-                <Briefcase className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{dailyStats.today}</div>
-                <p className="text-xs text-muted-foreground">Kecha: {dailyStats.yesterday}</p>
-                <p className={`text-sm font-semibold mt-2 ${dailyDiff >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {dailyDiff >= 0 ? '+' : ''}{dailyDiff} ta farq
-                </p>
-              </CardContent>
-            </Card>
+          {profile?.role !== "SEAMSTRESS" && (
+            <>
+              <StatCard
+                label="Ochiq ishlar"
+                value={stats.openJobs}
+                suffix="ta"
+                icon={CheckCircle2}
+                tone="success"
+              />
+              <StatCard
+                label="Bugungi ishlar"
+                value={dailyStats.today}
+                suffix="ta"
+                icon={Clock}
+                tone="warning"
+                trend={{
+                  value: `${dailyDiff >= 0 ? "+" : ""}${dailyDiff} ta`,
+                  up: dailyDiff >= 0,
+                  note: `kecha: ${dailyStats.yesterday}`,
+                }}
+              />
+            </>
           )}
 
-          {profile?.role === 'SEAMSTRESS' && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Jami daromad</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.totalEarnings.toLocaleString()} so'm
-                </div>
-              </CardContent>
-            </Card>
+          {profile?.role === "SEAMSTRESS" && (
+            <StatCard
+              label="Jami daromad"
+              value={stats.totalEarnings.toLocaleString()}
+              suffix="so'm"
+              icon={DollarSign}
+              tone="success"
+            />
           )}
         </div>
 
+        {/* Quick actions */}
         <Card>
           <CardHeader>
-            <CardTitle>Tezkor amallar</CardTitle>
+            <CardTitle className="text-section-title">Tezkor amallar</CardTitle>
             <CardDescription>Tez-tez ishlatiladigan funksiyalar</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="max-h-[400px] overflow-y-auto pr-2">
-              <div className="space-y-2">
-            {profile?.role === 'SEAMSTRESS' && (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => navigate('/my-tasks')}
-                  className="flex-1 p-4 bg-secondary text-secondary-foreground rounded-lg hover:opacity-90 transition-opacity"
-                >
-                  <ClipboardList className="h-6 w-6 mb-2 mx-auto" />
-                  <p className="font-medium">Vazifalarim</p>
-                </button>
-                <button
-                  onClick={() => navigate('/my-earnings')}
-                  className="flex-1 p-4 bg-green-600 text-white rounded-lg hover:opacity-90 transition-opacity"
-                >
-                  <DollarSign className="h-6 w-6 mb-2 mx-auto" />
-                  <p className="font-medium">Daromadlarim</p>
-                </button>
-              </div>
-            )}
-            {(profile?.role === 'ADMIN' || profile?.role === 'MANAGER') && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                {profile?.role === 'ADMIN' && (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {quickActions.map((action) => {
+                const Icon = action.icon;
+                return (
                   <button
-                    onClick={() => navigate('/attendance')}
-                    className="p-4 bg-slate-700 text-white rounded-lg hover:opacity-90 transition-opacity"
+                    key={action.to}
+                    onClick={() => navigate(action.to)}
+                    className="flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-4 text-center transition-colors hover:border-primary/40 hover:bg-accent"
                   >
-                    <Clock className="h-6 w-6 mb-2 mx-auto" />
-                    <p className="font-medium">Davomat</p>
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <span className="text-sm font-medium">{action.label}</span>
                   </button>
-                )}
-                <button
-                  onClick={() => navigate('/jobs')}
-                  className="p-4 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
-                >
-                  <Briefcase className="h-6 w-6 mb-2 mx-auto" />
-                  <p className="font-medium">Yangi ish yaratish</p>
-                </button>
-                    <button
-                      onClick={() => navigate('/tasks')}
-                      className="p-4 bg-blue-600 text-white rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      <ClipboardList className="h-6 w-6 mb-2 mx-auto" />
-                      <p className="font-medium">Vazifa berish</p>
-                    </button>
-                    <button
-                      onClick={() => navigate('/expenses')}
-                      className="p-4 bg-orange-600 text-white rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      <Receipt className="h-6 w-6 mb-2 mx-auto" />
-                      <p className="font-medium">Xarajatlar</p>
-                    </button>
-                    <button
-                      onClick={() => navigate('/incoming-jobs')}
-                      className="p-4 bg-green-600 text-white rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      <Briefcase className="h-6 w-6 mb-2 mx-auto" />
-                      <p className="font-medium">Kelgan ish</p>
-                    </button>
-                    <button
-                      onClick={() => navigate('/revenue')}
-                      className="p-4 bg-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      <TrendingUp className="h-6 w-6 mb-2 mx-auto" />
-                      <p className="font-medium">Daromad</p>
-                    </button>
-                <button
-                  onClick={() => navigate('/reports')}
-                  className="p-4 bg-secondary text-secondary-foreground rounded-lg hover:opacity-90 transition-opacity"
-                >
-                  <TrendingUp className="h-6 w-6 mb-2 mx-auto" />
-                      <p className="font-medium">Hisobotlar</p>
-                </button>
-              </div>
-            )}
-              </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>

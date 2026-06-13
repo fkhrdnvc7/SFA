@@ -137,7 +137,7 @@ const Colors = () => {
     <Layout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Ranglar</h1>
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Ranglar</h1>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button>

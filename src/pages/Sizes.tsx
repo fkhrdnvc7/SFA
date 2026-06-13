@@ -137,7 +137,7 @@ const Sizes = () => {
     <Layout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">O'lchamlar</h1>
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">O'lchamlar</h1>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button>
