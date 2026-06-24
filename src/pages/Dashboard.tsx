@@ -76,8 +76,11 @@ const Dashboard = () => {
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
+    } else if (profile && profile.role === 'ISH_BERUVCHI') {
+      // Redirect employer to their own dashboard
+      navigate("/employer-dashboard");
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, profile, navigate]);
 
   useEffect(() => {
     if (profile) {

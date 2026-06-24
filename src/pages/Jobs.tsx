@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { createNotification } from "@/lib/notifications";
 
 interface Job {
   id: string;
@@ -142,6 +143,17 @@ const Jobs = () => {
         .eq('id', jobId);
 
       if (error) throw error;
+
+      const job = jobs.find((j) => j.id === jobId);
+      await createNotification({
+        title: newStatus === 'yopiq' ? 'Ish yopildi' : 'Ish ochildi',
+        body: job
+          ? `"${job.job_name}" ishi ${newStatus === 'yopiq' ? 'yopildi' : 'qayta ochildi'}`
+          : `Ish holati ${newStatus} ga o'zgartirildi`,
+        type: newStatus === 'yopiq' ? 'success' : 'info',
+        related_table: 'jobs',
+        related_id: jobId,
+      });
 
       toast.success(`Ish ${newStatus === 'ochiq' ? 'ochildi' : 'yopildi'}`);
       fetchJobs();

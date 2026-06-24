@@ -137,6 +137,8 @@ const Users = () => {
         return 'Menejer';
       case 'SEAMSTRESS':
         return 'Tikuvchi';
+      case 'ISH_BERUVCHI':
+        return 'Ish beruvchi';
       default:
         return role;
     }
@@ -217,6 +219,7 @@ const Users = () => {
                     <SelectContent>
                       <SelectItem value="SEAMSTRESS">Tikuvchi</SelectItem>
                       <SelectItem value="MANAGER">Menejer</SelectItem>
+                      <SelectItem value="ISH_BERUVCHI">Ish beruvchi</SelectItem>
                       <SelectItem value="ADMIN">Administrator</SelectItem>
                     </SelectContent>
                   </Select>

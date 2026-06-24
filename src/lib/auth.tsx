@@ -18,7 +18,7 @@ interface Profile {
   id: string;
   full_name: string;
   email: string;
-  role: 'ADMIN' | 'MANAGER' | 'SEAMSTRESS';
+  role: 'ADMIN' | 'MANAGER' | 'SEAMSTRESS' | 'ISH_BERUVCHI';
   is_active: boolean;
 }
 

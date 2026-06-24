@@ -17,13 +17,26 @@ import {
   TrendingUp,
   ClipboardList,
   Receipt,
+  Building2,
+  Send,
+  ChevronDown,
+  ChevronRight,
+  Settings,
+  Wallet,
+  UserCog,
+  FileText,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
-type Role = "ADMIN" | "MANAGER" | "SEAMSTRESS";
+import NotificationBell from "@/components/NotificationBell";
+import NotificationBellEnhanced from "@/components/NotificationBellEnhanced";
+
+type Role = "ADMIN" | "MANAGER" | "SEAMSTRESS" | "ISH_BERUVCHI";
 
 interface NavItem {
   to: string;
@@ -32,37 +45,149 @@ interface NavItem {
   roles?: Role[];
 }
 
-const navigationItems: NavItem[] = [
-  { to: "/dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
-  { to: "/jobs", label: "Ishlar", icon: Briefcase, roles: ["ADMIN", "MANAGER"] },
-  { to: "/tasks", label: "Vazifa berish", icon: ClipboardList, roles: ["ADMIN", "MANAGER"] },
-  { to: "/my-tasks", label: "Vazifalarim", icon: ClipboardList, roles: ["SEAMSTRESS"] },
-  { to: "/incoming-jobs", label: "Kelgan ish", icon: PackagePlus, roles: ["ADMIN", "MANAGER"] },
-  { to: "/outgoing-jobs-list", label: "Ketgan ish", icon: PackageMinus, roles: ["ADMIN", "MANAGER"] },
-  { to: "/revenue", label: "Daromad", icon: TrendingUp, roles: ["ADMIN", "MANAGER"] },
-  { to: "/expenses", label: "Xarajatlar", icon: Receipt, roles: ["ADMIN", "MANAGER"] },
-  { to: "/operations", label: "Operatsiyalar", icon: Scissors, roles: ["ADMIN", "MANAGER"] },
-  { to: "/attendance", label: "Davomat", icon: Clock, roles: ["ADMIN"] },
-  { to: "/my-earnings", label: "Daromadlarim", icon: DollarSign, roles: ["SEAMSTRESS"] },
-  { to: "/payroll", label: "Oylik maosh", icon: DollarSign, roles: ["ADMIN", "MANAGER"] },
-  { to: "/users", label: "Foydalanuvchilar", icon: Users, roles: ["ADMIN"] },
-  { to: "/reports", label: "Hisobotlar", icon: BarChart3, roles: ["ADMIN", "MANAGER"] },
+interface NavSection {
+  title?: string;
+  icon?: typeof LayoutDashboard;
+  collapsible?: boolean;
+  items: NavItem[];
+}
+
+const navigationSections: NavSection[] = [
+  // Dashboard - no title, always first
+  {
+    items: [
+      { to: "/dashboard", label: "Bosh sahifa", icon: LayoutDashboard, roles: ["ADMIN", "MANAGER", "SEAMSTRESS"] },
+      { to: "/employer-dashboard", label: "Bosh sahifa", icon: LayoutDashboard, roles: ["ISH_BERUVCHI"] },
+    ],
+  },
+  // Employer's Jobs Section
+  {
+    title: "Ishlar",
+    icon: Briefcase,
+    collapsible: true,
+    items: [
+      { to: "/employer-pending-jobs", label: "Kutilayotgan ishlar", icon: Clock, roles: ["ISH_BERUVCHI"] },
+      { to: "/employer-approved-jobs", label: "Tasdiqlangan ishlar", icon: CheckCircle, roles: ["ISH_BERUVCHI"] },
+      { to: "/employer-rejected-jobs", label: "Rad etilgan ishlar", icon: XCircle, roles: ["ISH_BERUVCHI"] },
+      { to: "/employer-statistics", label: "Statistika", icon: BarChart3, roles: ["ISH_BERUVCHI"] },
+    ],
+  },
+  // Admin Employer Management
+  {
+    title: "Ish Beruvchilar",
+    icon: Building2,
+    collapsible: true,
+    items: [
+      { to: "/employers", label: "Ish beruvchilar", icon: Building2, roles: ["ADMIN", "MANAGER"] },
+      { to: "/admin-employer-dashboard", label: "Ish beruvchilar dashboard", icon: BarChart3, roles: ["ADMIN", "MANAGER"] },
+      { to: "/employer-finance", label: "Ish beruvchi moliya", icon: Wallet, roles: ["ADMIN", "MANAGER"] },
+    ],
+  },
+  // Work Management
+  {
+    title: "Ish Boshqaruvi",
+    icon: Briefcase,
+    collapsible: true,
+    items: [
+      { to: "/jobs", label: "Ishlar", icon: Briefcase, roles: ["ADMIN", "MANAGER"] },
+      { to: "/tasks", label: "Vazifa berish", icon: ClipboardList, roles: ["ADMIN", "MANAGER"] },
+      { to: "/my-tasks", label: "Vazifalarim", icon: ClipboardList, roles: ["SEAMSTRESS"] },
+      { to: "/incoming-jobs", label: "Kelgan ish", icon: PackagePlus, roles: ["ADMIN", "MANAGER"] },
+      { to: "/outgoing-jobs-list", label: "Ketgan ish", icon: PackageMinus, roles: ["ADMIN", "MANAGER"] },
+      { to: "/operations", label: "Operatsiyalar", icon: Scissors, roles: ["ADMIN", "MANAGER"] },
+    ],
+  },
+  // Finance
+  {
+    title: "Moliya",
+    icon: Wallet,
+    collapsible: true,
+    items: [
+      { to: "/revenue", label: "Daromad", icon: TrendingUp, roles: ["ADMIN", "MANAGER"] },
+      { to: "/expenses", label: "Xarajatlar", icon: Receipt, roles: ["ADMIN", "MANAGER"] },
+      { to: "/payroll", label: "Oylik maosh", icon: DollarSign, roles: ["ADMIN", "MANAGER"] },
+      { to: "/my-earnings", label: "Daromadlarim", icon: DollarSign, roles: ["SEAMSTRESS"] },
+    ],
+  },
+  // People/HR
+  {
+    title: "Jamoat",
+    icon: UserCog,
+    collapsible: true,
+    items: [
+      { to: "/attendance", label: "Davomat", icon: Clock, roles: ["ADMIN"] },
+      { to: "/users", label: "Foydalanuvchilar", icon: Users, roles: ["ADMIN"] },
+    ],
+  },
+  // Reports
+  {
+    title: "Hisobotlar",
+    icon: FileText,
+    collapsible: true,
+    items: [
+      { to: "/reports", label: "Hisobotlar", icon: BarChart3, roles: ["ADMIN", "MANAGER"] },
+    ],
+  },
+  // Settings
+  {
+    title: "Sozlamalar",
+    icon: Settings,
+    collapsible: true,
+    items: [
+      { to: "/telegram-settings", label: "Telegram", icon: Send, roles: ["ADMIN"] },
+    ],
+  },
 ];
 
 const roleLabel: Record<string, string> = {
   ADMIN: "Administrator",
   MANAGER: "Menejer",
   SEAMSTRESS: "Tikuvchi",
+  ISH_BERUVCHI: "Ish beruvchi",
 };
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const { signOut, profile } = useAuth();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<number, boolean>>({});
+  const [expandedSectionsMobile, setExpandedSectionsMobile] = useState<Record<number, boolean>>({});
 
-  const filteredItems = navigationItems.filter(
-    (item) => !item.roles || item.roles.includes((profile?.role as Role) || "SEAMSTRESS"),
-  );
+  const toggleSection = (index: number) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const toggleSectionMobile = (index: number) => {
+    setExpandedSectionsMobile((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const filteredSections = navigationSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (item) => !item.roles || item.roles.includes((profile?.role as Role) || "SEAMSTRESS"),
+      ),
+    }))
+    .filter((section) => section.items.length > 0);
+
+  // Auto-expand section that contains active route
+  useEffect(() => {
+    filteredSections.forEach((section, index) => {
+      if (section.collapsible) {
+        const hasActiveItem = section.items.some(item => item.to === location.pathname);
+        if (hasActiveItem) {
+          setExpandedSections(prev => ({ ...prev, [index]: true }));
+          setExpandedSectionsMobile(prev => ({ ...prev, [index]: true }));
+        }
+      }
+    });
+  }, [location.pathname]);
 
   const initials = (profile?.full_name || "U")
     .split(" ")
@@ -71,30 +196,88 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     .join("")
     .toUpperCase();
 
-  const NavItems = ({ onNavigate }: { onNavigate?: () => void }) => (
-    <>
-      {filteredItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = location.pathname === item.to;
-        return (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            onClick={onNavigate}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors border-l-2 border-transparent",
-              isActive
-                ? "border-sidebar-primary bg-white/10 text-white font-semibold"
-                : "text-sidebar-foreground hover:bg-white/5 hover:text-white",
+  const NavItems = ({ onNavigate, isMobile = false }: { onNavigate?: () => void; isMobile?: boolean }) => {
+    const currentExpandedSections = isMobile ? expandedSectionsMobile : expandedSections;
+    const currentToggleSection = isMobile ? toggleSectionMobile : toggleSection;
+
+    return (
+      <>
+        {filteredSections.map((section, sectionIndex) => (
+          <div key={sectionIndex}>
+            {section.title && !section.collapsible && (
+              <div className="px-3 pt-4 pb-2 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/60">
+                {section.title}
+              </div>
             )}
-          >
-            <Icon className="h-5 w-5 shrink-0" />
-            <span>{item.label}</span>
-          </NavLink>
-        );
-      })}
-    </>
-  );
+            {section.collapsible && section.title ? (
+              <>
+                <button
+                  onClick={() => currentToggleSection(sectionIndex)}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors border-l-2 border-transparent mt-2",
+                    "text-sidebar-foreground hover:bg-white/5 hover:text-white",
+                  )}
+                >
+                  {section.icon && <section.icon className="h-5 w-5 shrink-0" />}
+                  <span className="flex-1 text-left">{section.title}</span>
+                  {currentExpandedSections[sectionIndex] ? (
+                    <ChevronDown className="h-4 w-4 shrink-0" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 shrink-0" />
+                  )}
+                </button>
+                {currentExpandedSections[sectionIndex] && (
+                  <div className="mt-1 space-y-1">
+                    {section.items.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = location.pathname === item.to;
+                      return (
+                        <NavLink
+                          key={item.to}
+                          to={item.to}
+                          onClick={onNavigate}
+                          className={cn(
+                            "flex items-center gap-3 rounded-lg pl-8 pr-3 py-2 text-sm font-medium transition-colors border-l-2 border-transparent",
+                            isActive
+                              ? "border-sidebar-primary bg-white/10 text-white font-semibold"
+                              : "text-sidebar-foreground hover:bg-white/5 hover:text-white",
+                          )}
+                        >
+                          <Icon className="h-4 w-4 shrink-0" />
+                          <span>{item.label}</span>
+                        </NavLink>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            ) : (
+              section.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.to;
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    onClick={onNavigate}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors border-l-2 border-transparent",
+                      isActive
+                        ? "border-sidebar-primary bg-white/10 text-white font-semibold"
+                        : "text-sidebar-foreground hover:bg-white/5 hover:text-white",
+                    )}
+                  >
+                    <Icon className="h-5 w-5 shrink-0" />
+                    <span>{item.label}</span>
+                  </NavLink>
+                );
+              })
+            )}
+          </div>
+        ))}
+      </>
+    );
+  };
 
   const Brand = () => (
     <div className="flex items-center gap-3">
@@ -166,7 +349,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 </div>
                 <ScrollArea className="h-[calc(100vh-8rem)]">
                   <nav className="flex flex-col gap-1 p-3">
-                    <NavItems onNavigate={() => setOpen(false)} />
+                    <NavItems onNavigate={() => setOpen(false)} isMobile={true} />
                   </nav>
                 </ScrollArea>
                 <SidebarFooter onNavigate={() => setOpen(false)} />
@@ -183,6 +366,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
           {/* Profile chip (desktop) */}
           <div className="hidden items-center gap-3 lg:flex">
+            {(profile?.role === "ADMIN" || profile?.role === "MANAGER" || profile?.role === "ISH_BERUVCHI") && (
+              <NotificationBellEnhanced />
+            )}
             <div className="text-right">
               <p className="text-sm font-medium leading-tight">{profile?.full_name}</p>
               <p className="text-xs text-muted-foreground leading-tight">

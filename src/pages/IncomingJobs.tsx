@@ -11,9 +11,16 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { createNotification } from "@/lib/notifications";
+
+interface Employer {
+  id: string;
+  name: string;
+}
 
 interface IncomingJob {
   id: string;
@@ -24,6 +31,11 @@ interface IncomingJob {
   notes?: string;
   date: string;
   created_at: string;
+  employer_id?: string | null;
+  client_price_per_unit?: number | null;
+  approval_status?: string | null;
+  employer_price_per_unit?: number | null;
+  employers?: { name: string } | null;
   outgoing_jobs?: { quantity_sent: number }[];
 }
 
@@ -31,6 +43,7 @@ const IncomingJobs = () => {
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
   const [jobs, setJobs] = useState<IncomingJob[]>([]);
+  const [employers, setEmployers] = useState<Employer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<IncomingJob | null>(null);
@@ -40,16 +53,33 @@ const IncomingJobs = () => {
   const [extraWork, setExtraWork] = useState("0");
   const [notes, setNotes] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [employerId, setEmployerId] = useState("");
+  const [clientPricePerUnit, setClientPricePerUnit] = useState("");
 
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
     } else if (profile && (profile.role === 'ADMIN' || profile.role === 'MANAGER')) {
       fetchJobs();
+      fetchEmployers();
     } else if (profile && profile.role === 'SEAMSTRESS') {
       navigate("/dashboard");
     }
   }, [user, profile, loading, navigate]);
+
+  const fetchEmployers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('employers')
+        .select('id, name')
+        .eq('is_active', true)
+        .order('name');
+      if (error) throw error;
+      setEmployers(data || []);
+    } catch {
+      console.error('Ish beruvchilarni yuklashda xatolik');
+    }
+  };
 
   const fetchJobs = async () => {
     try {
@@ -57,6 +87,7 @@ const IncomingJobs = () => {
         .from('incoming_jobs')
         .select(`
           *,
+          employers (name),
           outgoing_jobs (quantity_sent)
         `)
         .order('date', { ascending: false })
@@ -73,33 +104,87 @@ const IncomingJobs = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const qty = parseInt(quantity);
+      const pricePerUnit = parseFloat(clientPricePerUnit) || 0;
+      const selectedEmployer = employers.find((emp) => emp.id === employerId);
+
       if (editingJob) {
         const { error } = await supabase
           .from('incoming_jobs')
           .update({
             job_name: jobName,
-            quantity: parseInt(quantity),
+            quantity: qty,
             defective_items: parseInt(defectiveItems) || 0,
             extra_work: parseInt(extraWork) || 0,
             notes: notes || null,
             date,
+            employer_id: employerId || null,
+            client_price_per_unit: pricePerUnit || null,
           })
           .eq('id', editingJob.id);
         if (error) throw error;
         toast.success("Yangilandi");
       } else {
-        const { error } = await supabase
+        const { data: newJob, error } = await supabase
           .from('incoming_jobs')
           .insert({
             job_name: jobName,
-            quantity: parseInt(quantity),
+            quantity: qty,
             defective_items: parseInt(defectiveItems) || 0,
             extra_work: parseInt(extraWork) || 0,
             notes: notes || null,
             date,
+            employer_id: employerId || null,
+            client_price_per_unit: pricePerUnit || null,
+            approval_status: employerId ? 'pending' : null,
             created_by: user?.id,
-          });
+          })
+          .select('id')
+          .single();
         if (error) throw error;
+
+        if (employerId && newJob) {
+          await supabase.from('employer_transactions').insert({
+            employer_id: employerId,
+            incoming_job_id: newJob.id,
+            transaction_type: 'received',
+            quantity: qty,
+            price_per_unit: pricePerUnit,
+            total_amount: qty * pricePerUnit,
+            transaction_date: date,
+            created_by: user!.id,
+            notes: `Ish qabul qilindi: ${jobName}`,
+          });
+
+          // Get employer's user_id for notification
+          const { data: employerData } = await supabase
+            .from('employers')
+            .select('user_id, name')
+            .eq('id', employerId)
+            .single();
+
+          // Send notification to employer's account
+          if (employerData?.user_id) {
+            await createNotification({
+              title: 'Yangi ish',
+              body: `${jobName} — ${qty} dona. Iltimos tasdiqlang.`,
+              type: 'info',
+              related_table: 'incoming_jobs',
+              related_id: newJob.id,
+              user_id: employerData.user_id,
+            });
+          }
+
+          // Send notification to all admins/managers
+          await createNotification({
+            title: 'Yangi ish qabul qilindi',
+            body: `${jobName} — ${qty} dona ${selectedEmployer?.name || 'ish beruvchi'} dan qabul qilindi`,
+            type: 'info',
+            related_table: 'incoming_jobs',
+            related_id: newJob.id,
+          });
+        }
+
         toast.success("Qo'shildi");
       }
       resetForm();
@@ -130,6 +215,8 @@ const IncomingJobs = () => {
     setExtraWork(job.extra_work.toString());
     setNotes(job.notes || "");
     setDate(job.date);
+    setEmployerId(job.employer_id || "");
+    setClientPricePerUnit(job.client_price_per_unit?.toString() || "");
     setOpen(true);
   };
 
@@ -140,6 +227,8 @@ const IncomingJobs = () => {
     setExtraWork("0");
     setNotes("");
     setDate(new Date().toISOString().split('T')[0]);
+    setEmployerId("");
+    setClientPricePerUnit("");
     setEditingJob(null);
   };
 
@@ -200,6 +289,19 @@ const IncomingJobs = () => {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label>Ish beruvchi</Label>
+                  <Select value={employerId} onValueChange={setEmployerId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Ish beruvchini tanlang" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employers.map((emp) => (
+                        <SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
                   <Label>Soni *</Label>
                   <Input
                     type="number"
@@ -207,6 +309,17 @@ const IncomingJobs = () => {
                     onChange={(e) => setQuantity(e.target.value)}
                     placeholder="0"
                     required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Birlik narxi (mijozdan)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={clientPricePerUnit}
+                    onChange={(e) => setClientPricePerUnit(e.target.value)}
+                    placeholder="0"
                   />
                 </div>
                 <div className="space-y-2">
@@ -270,11 +383,13 @@ const IncomingJobs = () => {
                     <TableRow>
                       <TableHead>Sana</TableHead>
                       <TableHead>Ish nomi</TableHead>
+                      <TableHead>Ish beruvchi</TableHead>
                       <TableHead>Kelgan</TableHead>
                       <TableHead>Ketgan</TableHead>
                       <TableHead>Qolgan</TableHead>
                       <TableHead>Yaroqsiz</TableHead>
                       <TableHead>Ortiqcha</TableHead>
+                      <TableHead>Tasdiqlash</TableHead>
                       <TableHead>Holat</TableHead>
                       <TableHead className="text-right">Amallar</TableHead>
                     </TableRow>
@@ -287,11 +402,35 @@ const IncomingJobs = () => {
                         <TableRow key={job.id}>
                           <TableCell>{new Date(job.date).toLocaleDateString('uz-UZ')}</TableCell>
                           <TableCell className="font-medium">{job.job_name}</TableCell>
+                          <TableCell>{job.employers?.name || "—"}</TableCell>
                           <TableCell>{job.quantity}</TableCell>
                           <TableCell>{totalSent}</TableCell>
                           <TableCell>{remaining}</TableCell>
                           <TableCell>{job.defective_items || 0}</TableCell>
                           <TableCell>{job.extra_work || 0}</TableCell>
+                          <TableCell>
+                            {job.approval_status === 'pending' && (
+                              <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                                Kutilmoqda
+                              </Badge>
+                            )}
+                            {job.approval_status === 'approved' && (
+                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                Tasdiqlangan
+                              </Badge>
+                            )}
+                            {job.approval_status === 'rejected' && (
+                              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                                Rad etilgan
+                              </Badge>
+                            )}
+                            {!job.approval_status && job.employer_id && (
+                              <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+                                Eski
+                              </Badge>
+                            )}
+                            {!job.employer_id && <span className="text-muted-foreground">—</span>}
+                          </TableCell>
                           <TableCell>{getStatus(job)}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">

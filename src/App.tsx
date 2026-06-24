@@ -25,6 +25,15 @@ import Revenue from "./pages/Revenue";
 import Tasks from "./pages/Tasks";
 import MyTasks from "./pages/MyTasks";
 import Expenses from "./pages/Expenses";
+import Employers from "./pages/Employers";
+import EmployerFinance from "./pages/EmployerFinance";
+import TelegramSettings from "./pages/TelegramSettings";
+import EmployerDashboard from "./pages/EmployerDashboard";
+import EmployerPendingJobs from "./pages/EmployerPendingJobs";
+import EmployerApprovedJobs from "./pages/EmployerApprovedJobs";
+import EmployerRejectedJobs from "./pages/EmployerRejectedJobs";
+import EmployerStatistics from "./pages/EmployerStatistics";
+import AdminEmployerDashboard from "./pages/AdminEmployerDashboard";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +63,15 @@ const App = () => (
             <Route path="/my-tasks" element={<MyTasks />} />
             <Route path="/my-earnings" element={<MyEarnings />} />
             <Route path="/incoming-jobs" element={<IncomingJobs />} />
+            <Route path="/employers" element={<Employers />} />
+            <Route path="/employer-finance" element={<EmployerFinance />} />
+            <Route path="/employer-dashboard" element={<EmployerDashboard />} />
+            <Route path="/employer-pending-jobs" element={<EmployerPendingJobs />} />
+            <Route path="/employer-approved-jobs" element={<EmployerApprovedJobs />} />
+            <Route path="/employer-rejected-jobs" element={<EmployerRejectedJobs />} />
+            <Route path="/employer-statistics" element={<EmployerStatistics />} />
+            <Route path="/admin-employer-dashboard" element={<AdminEmployerDashboard />} />
+            <Route path="/telegram-settings" element={<TelegramSettings />} />
             <Route path="/outgoing-jobs-list" element={<OutgoingJobsList />} />
             <Route path="/outgoing-jobs/:id" element={<OutgoingJobs />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

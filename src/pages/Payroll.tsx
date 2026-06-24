@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, DollarSign, Download, Eye, TrendingUp, PieChart as PieChartIcon } from "lucide-react";
 import { toast } from "sonner";
+import { createNotification } from "@/lib/notifications";
 import {
   BarChart,
   Bar,
@@ -364,6 +365,13 @@ const Payroll = () => {
 
         if (error) throw error;
       }
+
+      await createNotification({
+        title: 'Maosh to\'lovi amalga oshirildi',
+        body: `${selectedSeamstress.seamstress_name} uchun ${amount.toLocaleString('uz-UZ')} so'm to\'landi`,
+        type: 'success',
+        related_table: 'payroll_records',
+      });
 
       toast.success("To'lov holati yangilandi");
       setPaymentDialog(false);
