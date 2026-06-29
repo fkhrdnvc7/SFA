@@ -124,6 +124,10 @@ const Users = () => {
         return 'default';
       case 'MANAGER':
         return 'secondary';
+      case 'ISH_BERUVCHI':
+        return 'secondary';
+      case 'SEAMSTRESS':
+        return 'outline';
       default:
         return 'outline';
     }

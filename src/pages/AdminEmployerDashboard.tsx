@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge";
 interface EmployerPerformance {
   id: string;
   name: string;
+  firstName: string | null;
+  lastName: string | null;
   totalJobs: number;
   approved: number;
   rejected: number;
@@ -132,6 +134,8 @@ const AdminEmployerDashboard = () => {
         return {
           id: employer.id,
           name: employer.company_name,
+          firstName: employer.first_name || null,
+          lastName: employer.last_name || null,
           totalJobs: employerJobs.length,
           approved: employerApproved.length,
           rejected: employerRejected.length,
@@ -274,7 +278,14 @@ const AdminEmployerDashboard = () => {
                     <TableRow key={emp.id}>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <div className="font-medium">{emp.name}</div>
+                          <div>
+                            <div className="font-medium">{emp.name}</div>
+                            {(emp.firstName || emp.lastName) && (
+                              <div className="text-sm text-muted-foreground">
+                                {[emp.firstName, emp.lastName].filter(Boolean).join(' ')}
+                              </div>
+                            )}
+                          </div>
                           {index === 0 && <Badge variant="default">TOP 1</Badge>}
                         </div>
                       </TableCell>

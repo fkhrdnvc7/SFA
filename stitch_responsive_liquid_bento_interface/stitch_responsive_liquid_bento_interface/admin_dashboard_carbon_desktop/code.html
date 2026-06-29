@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SFA Tailoring - Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed": "#d8e2ff",
+                      "outline-variant": "#434655",
+                      "on-primary-fixed": "#00174b",
+                      "tertiary": "#ffb596",
+                      "on-surface-variant": "#a1a1aa",
+                      "on-background": "#ffffff",
+                      "on-error-container": "#ffdad6",
+                      "on-tertiary-container": "#ffede6",
+                      "primary-fixed": "#dbe1ff",
+                      "on-tertiary": "#581e00",
+                      "surface-container-highest": "#27272a",
+                      "surface-container-low": "#18181b",
+                      "outline": "#52525b",
+                      "on-secondary-fixed": "#001a42",
+                      "surface-dim": "#171717",
+                      "on-secondary-container": "#e6ecff",
+                      "on-tertiary-fixed": "#360f00",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "surface-variant": "#27272a",
+                      "tertiary-container": "#bc4800",
+                      "surface-container-high": "#27272a",
+                      "inverse-primary": "#0053db",
+                      "secondary": "#3b82f6",
+                      "surface-bright": "#3f3f46",
+                      "inverse-on-surface": "#27272a",
+                      "on-surface": "#ffffff",
+                      "on-secondary-fixed-variant": "#004395",
+                      "secondary-fixed-dim": "#adc6ff",
+                      "on-primary-container": "#ffffff",
+                      "surface-container": "#171717",
+                      "primary-container": "#2563eb",
+                      "surface": "#171717",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "background": "#171717",
+                      "tertiary-fixed": "#ffdbcd",
+                      "secondary-container": "#1d4ed8",
+                      "on-secondary": "#ffffff",
+                      "tertiary-fixed-dim": "#ffb596",
+                      "on-primary": "#ffffff",
+                      "on-error": "#690005",
+                      "inverse-surface": "#e4e4e7",
+                      "surface-container-lowest": "#09090b",
+                      "error-container": "#93000a",
+                      "error": "#ef4444",
+                      "on-tertiary-fixed-variant": "#7d2d00",
+                      "primary": "#2563eb",
+                      "surface-tint": "#2563eb"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "margin-desktop": "40px",
+                      "container-max": "1440px",
+                      "margin-mobile": "16px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "mono-label": [
+                              "JetBrains Mono"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "headline-xl": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "mono-label": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-xl": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .glass-card {
+            background-color: rgba(24, 24, 27, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border-radius: 1rem;
+        }
+        
+        .glass-row:hover {
+            transform: translateY(-2px);
+            background-color: rgba(39, 39, 42, 0.5);
+            transition: all 0.2s ease-out;
+        }
+
+        .hover-lift {
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .fade-in-stagger > * {
+            opacity: 0;
+            animation: fadeInScale 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .glass-button-primary {
+            background-color: #2563eb;
+            transition: all 0.2s;
+        }
+        .glass-button-primary:hover {
+            background-color: #1d4ed8;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+        }
+        .glass-button-primary:active {
+            transform: scale(0.97);
+        }
+
+        .glass-button-secondary {
+            background-color: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.2s;
+        }
+        .glass-button-secondary:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        .glass-button-secondary:active {
+            transform: scale(0.97);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+      </style>
+</head>
+<body class="bg-[#171717] text-white font-body-md min-h-screen flex overflow-hidden selection:bg-primary/30">
+<!-- Ambient Background -->
+<div class="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
+<div class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[150px]"></div>
+<div class="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-primary/5 blur-[180px]"></div>
+</div>
+<!-- SideNavBar -->
+<nav class="hidden lg:flex flex-col h-screen sticky top-0 bg-[#171717]/80 backdrop-blur-xl h-full w-64 border-r border-white/5 z-50">
+<div class="p-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white">styler</span>
+</div>
+<div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-semibold text-white">SFA Tailoring</h1>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Digital Silk ERP</p>
+</div>
+</div>
+<div class="px-6 mb-8">
+<button class="w-full py-3 rounded-xl flex items-center justify-center gap-2 font-body-md font-medium glass-button-primary text-white">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">add</span>
+                New Order
+            </button>
+</div>
+<div class="flex-1 overflow-y-auto px-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl font-body-md text-white bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+                Admin Panel
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl font-body-md text-on-surface-variant hover:text-white hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard_customize</span>
+                Manager View
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl font-body-md text-on-surface-variant hover:text-white hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">styler</span>
+                Production Deck
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl font-body-md text-on-surface-variant hover:text-white hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">business_center</span>
+                Employer Portal
+            </a>
+</div>
+<div class="mt-auto p-4 border-t border-white/5 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl font-body-md text-on-surface-variant hover:text-white hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl font-body-md text-on-surface-variant hover:text-white hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+                Support
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar (Mobile mainly) -->
+<header class="flex justify-between items-center w-full px-4 h-16 sticky top-0 z-40 bg-[#171717]/80 backdrop-blur-xl border-b border-white/5 lg:hidden">
+<div class="flex items-center gap-3">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-semibold text-white">SFA Tailoring</h1>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<button class="hover:text-white transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="hover:text-white transition-colors"><span class="material-symbols-outlined">dark_mode</span></button>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-white/10" data-alt="A small circular avatar placeholder image showing a silhouetted professional tailor in a sleek digital environment. Dark moody lighting, professional aesthetic, high contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTn34u-66Romr-d4MAZrLdIqyHLOBDDYWj9NIiiZ92KU68v290UJ-nCnUs6Wgo_tO2bra2Jdl1Nax_8NAChCpvNq75y5DhWkke61kp9khDHwx045eOPQcjaNGlOnOH-Xp67Uo2JkOWQtqn5kymG8j64LDL3E_uCxOW18_nUd0tJSVyQfaCKsP-Cjvd-X5YHSgIPor16GAw4wEKpVR1dl4taoo1zXk6CXMByKiFZhUwSm0zWLiEZlcE"/>
+</div>
+</header>
+<!-- Desktop Header Area -->
+<header class="hidden lg:flex justify-between items-center px-10 py-8 z-30">
+<div>
+<h2 class="font-headline-xl text-headline-xl text-white tracking-tight">Admin Overview</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Real-time production metrics</p>
+</div>
+<div class="flex gap-4">
+<div class="relative glass-card !rounded-full px-5 py-3 flex items-center">
+<span class="material-symbols-outlined text-on-surface-variant mr-3 text-sm">search</span>
+<input class="bg-transparent border-none text-body-sm text-white focus:ring-0 w-64 placeholder-on-surface-variant outline-none" placeholder="Search orders..." type="text"/>
+</div>
+<button class="glass-card !rounded-full w-12 h-12 flex items-center justify-center text-on-surface-variant hover:text-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="glass-card !rounded-full w-12 h-12 flex items-center justify-center overflow-hidden border border-white/10 p-0">
+<img alt="User Profile" class="w-full h-full object-cover rounded-full" data-alt="A sharp, professional headshot of a master tailor or factory manager, lit with soft cool rim lighting in a modern dark-mode digital UI setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwm3P4qDVn8W0mRUhGDXcT8obYbf_FnnP23GBrXHgOBFe3ZiiOTkJ3euoHbxKEtUBIKayC-2UZFN3oolFBaqOBMR8d3v2ozz4LicA75s_n2joUSSWqbljhTKxm3LmXta7wn2ZKQdI0OkLq2AIlPNh32mTTWvNKQze1GQsywWPdXRzdEJ6iQ34rZ23UZiuQvh2id4vtoWY3Gwj-irlh9TZx-lORANZrIEkwQ_zOiWr3vav2mIGJFxCO"/>
+</button>
+</div>
+</header>
+<!-- Bento Grid Canvas -->
+<main class="flex-1 overflow-y-auto p-4 lg:px-10 pb-10 pt-0">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6 max-w-[1600px] mx-auto fade-in-stagger">
+<!-- Stat Cards Row -->
+<div class="xl:col-span-3 md:col-span-1 glass-card p-6 hover-lift" style="animation-delay: 150ms;">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary">local_shipping</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-label-md text-label-md border border-emerald-500/20">+12%</span>
+</div>
+<p class="font-body-md text-on-surface-variant mb-1">Total Orders</p>
+<h3 class="font-headline-lg text-white">1,248</h3>
+</div>
+<div class="xl:col-span-3 md:col-span-1 glass-card p-6 hover-lift" style="animation-delay: 300ms;">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-xl bg-blue-400/10 flex items-center justify-center border border-blue-400/20">
+<span class="material-symbols-outlined text-blue-400">cut</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-label-md text-label-md border border-emerald-500/20">Optimal</span>
+</div>
+<p class="font-body-md text-on-surface-variant mb-1">Active Tasks</p>
+<h3 class="font-headline-lg text-white">432</h3>
+</div>
+<div class="xl:col-span-3 md:col-span-1 glass-card p-6 hover-lift" style="animation-delay: 450ms;">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-xl bg-indigo-400/10 flex items-center justify-center border border-indigo-400/20">
+<span class="material-symbols-outlined text-indigo-400">attach_money</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-label-md text-label-md border border-emerald-500/20">+8.4%</span>
+</div>
+<p class="font-body-md text-on-surface-variant mb-1">Weekly Revenue</p>
+<h3 class="font-headline-lg text-white">$45.2k</h3>
+</div>
+<div class="xl:col-span-3 md:col-span-1 glass-card p-6 hover-lift" style="animation-delay: 600ms;">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-xl bg-red-400/10 flex items-center justify-center border border-red-400/20">
+<span class="material-symbols-outlined text-red-400">groups</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-red-500/10 text-red-400 font-label-md text-label-md border border-red-500/20">-2%</span>
+</div>
+<p class="font-body-md text-on-surface-variant mb-1">Team Efficiency</p>
+<h3 class="font-headline-lg text-white">94%</h3>
+</div>
+<!-- Main Content Row -->
+<!-- Recent Jobs Table -->
+<div class="xl:col-span-8 md:col-span-2 glass-card p-8 flex flex-col" style="animation-delay: 750ms;">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-headline-lg-mobile text-white">Active Production Queue</h3>
+<button class="font-body-sm font-medium text-primary hover:text-white transition-colors">View All</button>
+</div>
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-white/5 font-mono-label text-mono-label text-on-surface-variant uppercase tracking-wider">
+<th class="pb-4 px-4 font-medium">Job ID</th>
+<th class="pb-4 px-4 font-medium">Client/Type</th>
+<th class="pb-4 px-4 font-medium">Material</th>
+<th class="pb-4 px-4 font-medium">Status</th>
+<th class="pb-4 px-4 font-medium text-right">Progress</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-white">
+<tr class="border-b border-white/5 glass-row cursor-pointer transition-all">
+<td class="py-5 px-4 font-mono-label text-primary">#SFA-892</td>
+<td class="py-5 px-4">
+<div class="font-medium text-white mb-1">Bespoke Suit</div>
+<div class="text-on-surface-variant text-xs">Corp. Executive</div>
+</td>
+<td class="py-5 px-4 text-on-surface-variant">4.5m Worsted Wool</td>
+<td class="py-5 px-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-medium border border-blue-500/20">
+                                            Cutting
+                                        </span>
+</td>
+<td class="py-5 px-4 text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-blue-400 w-[30%] rounded-full"></div>
+</div>
+<span class="font-mono-label text-on-surface-variant w-8">30%</span>
+</div>
+</td>
+</tr>
+<tr class="border-b border-white/5 glass-row cursor-pointer transition-all">
+<td class="py-5 px-4 font-mono-label text-primary">#SFA-891</td>
+<td class="py-5 px-4">
+<div class="font-medium text-white mb-1">Silk Blouse Batch</div>
+<div class="text-on-surface-variant text-xs">Boutique Order</div>
+</td>
+<td class="py-5 px-4 text-on-surface-variant">120m Mulberry Silk</td>
+<td class="py-5 px-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium border border-primary/20">
+                                            Sewing
+                                        </span>
+</td>
+<td class="py-5 px-4 text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[75%] rounded-full"></div>
+</div>
+<span class="font-mono-label text-on-surface-variant w-8">75%</span>
+</div>
+</td>
+</tr>
+<tr class="glass-row cursor-pointer transition-all">
+<td class="py-5 px-4 font-mono-label text-primary">#SFA-889</td>
+<td class="py-5 px-4">
+<div class="font-medium text-white mb-1">Overcoat</div>
+<div class="text-on-surface-variant text-xs">Private Client</div>
+</td>
+<td class="py-5 px-4 text-on-surface-variant">3.2m Cashmere Blend</td>
+<td class="py-5 px-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20">
+                                            Finishing
+                                        </span>
+</td>
+<td class="py-5 px-4 text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-emerald-400 w-[90%] rounded-full"></div>
+</div>
+<span class="font-mono-label text-on-surface-variant w-8">90%</span>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Action Panel & Material Stock -->
+<div class="xl:col-span-4 md:col-span-2 flex flex-col gap-6">
+<!-- Quick Actions -->
+<div class="glass-card p-8 hover-lift" style="animation-delay: 900ms;">
+<h3 class="font-headline-lg-mobile text-white mb-6">Command Center</h3>
+<div class="flex flex-col gap-4">
+<button class="w-full py-4 px-5 rounded-xl flex items-center justify-start gap-4 font-body-md font-medium glass-button-primary text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+                                New Order
+                            </button>
+<button class="w-full py-4 px-5 rounded-xl flex items-center justify-start gap-4 font-body-md font-medium glass-button-secondary text-white">
+<span class="material-symbols-outlined">person_add</span>
+                                Add User
+                            </button>
+<button class="w-full py-4 px-5 rounded-xl flex items-center justify-start gap-4 font-body-md font-medium glass-button-secondary text-white">
+<span class="material-symbols-outlined">insert_chart</span>
+                                View Reports
+                            </button>
+</div>
+</div>
+<!-- Factory Environment Mini-Stat -->
+<div class="glass-card p-8 flex-1 flex flex-col justify-center hover-lift relative overflow-hidden" style="animation-delay: 1050ms;">
+<div class="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+<h4 class="font-body-md text-on-surface-variant mb-4 relative z-10">Shop Floor Env.</h4>
+<div class="flex items-end gap-6 relative z-10">
+<div>
+<span class="font-headline-xl text-white block leading-none mb-1">22°C</span>
+<span class="font-mono-label text-on-surface-variant uppercase tracking-wider">Temp</span>
+</div>
+<div class="w-px h-12 bg-white/10"></div>
+<div>
+<span class="font-headline-xl text-white block leading-none mb-1">45%</span>
+<span class="font-mono-label text-on-surface-variant uppercase tracking-wider">Humidity</span>
+</div>
+</div>
+<div class="mt-6 flex items-center text-sm text-emerald-400 gap-2 bg-emerald-500/10 w-fit px-3 py-1.5 rounded-lg border border-emerald-500/20 relative z-10">
+<span class="material-symbols-outlined text-[16px]">check_circle</span> Ideal for Silk Storage
+                        </div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex lg:hidden justify-around items-center px-4 py-3 bg-[#171717]/90 backdrop-blur-2xl border-t border-white/5 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+<a class="flex flex-col items-center justify-center text-primary rounded-xl px-4 py-1 font-label-md" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+            Home
+        </a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-white font-label-md transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">reorder</span>
+            Orders
+        </a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-white font-label-md transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">assignment</span>
+            Tasks
+        </a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-white font-label-md transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+            Profile
+        </a>
+</nav>
+<script>
+        // Simple script to handle staggering animation delays for bento items dynamically if needed
+        document.addEventListener('DOMContentLoaded', () => {
+            const bentoItems = document.querySelectorAll('.fade-in-stagger > div');
+            bentoItems.forEach((item, index) => {
+                if(!item.style.animationDelay) {
+                    item.style.animationDelay = `${index * 150}ms`;
+                }
+            });
+        });
+    </script>
+</body></html>

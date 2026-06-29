@@ -34,6 +34,7 @@ const NotificationBell = () => {
     if (!user) return;
 
     try {
+      // Fetch notifications
       const { data, error } = await supabase
         .from("notifications")
         .select("*")
@@ -42,9 +43,21 @@ const NotificationBell = () => {
 
       if (error) throw error;
 
+      // Fetch user's read status
+      const { data: readData } = await supabase
+        .from("notification_reads")
+        .select("notification_id")
+        .eq("user_id", user.id);
+
+      const readIds = new Set((readData || []).map(r => r.notification_id));
+
       const filtered = (data || []).filter(
         (n) => n.user_id === user.id || n.user_id === null,
-      );
+      ).map(n => ({
+        ...n,
+        is_read: readIds.has(n.id)
+      }));
+
       setNotifications(filtered);
       setUnreadCount(filtered.filter((n) => !n.is_read).length);
     } catch {
@@ -87,10 +100,15 @@ const NotificationBell = () => {
   }, [user]);
 
   const markAsRead = async (id: string) => {
+    if (!user) return;
+
     const { error } = await supabase
-      .from("notifications")
-      .update({ is_read: true })
-      .eq("id", id);
+      .from("notification_reads")
+      .upsert({
+        notification_id: id,
+        user_id: user.id,
+        read_at: new Date().toISOString()
+      });
 
     if (!error) {
       setNotifications((prev) =>
@@ -101,13 +119,20 @@ const NotificationBell = () => {
   };
 
   const markAllAsRead = async () => {
+    if (!user) return;
+
     const unreadIds = notifications.filter((n) => !n.is_read).map((n) => n.id);
     if (unreadIds.length === 0) return;
 
+    const records = unreadIds.map(id => ({
+      notification_id: id,
+      user_id: user.id,
+      read_at: new Date().toISOString()
+    }));
+
     const { error } = await supabase
-      .from("notifications")
-      .update({ is_read: true })
-      .in("id", unreadIds);
+      .from("notification_reads")
+      .upsert(records);
 
     if (!error) {
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));

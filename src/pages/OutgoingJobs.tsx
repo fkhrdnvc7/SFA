@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { createNotification } from "@/lib/notifications";
+import { formatDateShort } from "@/lib/dateFormat";
 
 interface IncomingJob {
   id: string;
@@ -80,11 +82,13 @@ const OutgoingJobs = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const qty = parseInt(quantitySent);
+
       if (editingJob) {
         const { error } = await supabase
           .from('outgoing_jobs')
           .update({
-            quantity_sent: parseInt(quantitySent),
+            quantity_sent: qty,
             notes: notes || null,
             date,
           })
@@ -96,18 +100,101 @@ const OutgoingJobs = () => {
           .from('outgoing_jobs')
           .insert({
             incoming_job_id: id,
-            quantity_sent: parseInt(quantitySent),
+            quantity_sent: qty,
             notes: notes || null,
             date,
             created_by: user?.id,
           });
         if (error) throw error;
-        toast.success("Qo'shildi");
+
+        // Get incoming job and employer details
+        const { data: incomingJobData } = await supabase
+          .from('incoming_jobs')
+          .select(`
+            *,
+            employer:employers!employer_id(
+              id,
+              company_name,
+              user_id,
+              telegram_chat_id
+            )
+          `)
+          .eq('id', id)
+          .single();
+
+        if (incomingJobData) {
+          // Send notification to employer
+          if (incomingJobData.employer?.user_id) {
+            await createNotification({
+              title: 'Ish ketdi',
+              body: `${incomingJobData.job_name} — ${qty} dona sizga jo'natildi`,
+              type: 'success',
+              related_table: 'outgoing_jobs',
+              related_id: id,
+              user_id: incomingJobData.employer.user_id,
+            });
+          }
+
+          // Send Telegram notification to employer
+          if (incomingJobData.employer?.telegram_chat_id) {
+            try {
+              await supabase.functions.invoke('send-telegram-notification', {
+                body: {
+                  chat_id: incomingJobData.employer.telegram_chat_id,
+                  message: `🎉 <b>Sizga ish keldi!</b>\n\n` +
+                          `📦 Ish: <b>${incomingJobData.job_name}</b>\n` +
+                          `📊 Miqdor: <b>${qty} dona</b>\n` +
+                          `📅 Sana: ${formatDateShort(date)}\n\n` +
+                          `✅ Ishlaringiz tayyor!`
+                }
+              });
+            } catch (telegramError) {
+              console.error('Telegram xabar yuborishda xatolik:', telegramError);
+              // Don't fail the whole operation if telegram fails
+            }
+          }
+
+          // Check if all items have been sent out
+          const { data: allOutgoing } = await supabase
+            .from('outgoing_jobs')
+            .select('quantity_sent')
+            .eq('incoming_job_id', id);
+
+          const totalSent = (allOutgoing || []).reduce((sum, og) => sum + og.quantity_sent, 0) + qty;
+
+          // If all sent, close the job in jobs table
+          if (totalSent >= incomingJobData.quantity) {
+            const { error: closeJobError } = await supabase
+              .from('jobs')
+              .update({
+                status: 'yopiq',
+                completed_at: new Date().toISOString()
+              })
+              .eq('incoming_job_id', id);
+
+            if (closeJobError) {
+              console.error('Ishni yopishda xatolik:', closeJobError);
+            } else {
+              toast.success('Ish to\'liq tugadi va yopildi!');
+            }
+
+            // Notify admins/managers that job is complete
+            await createNotification({
+              title: 'Ish to\'liq tugadi',
+              body: `${incomingJobData.job_name} — barcha ${incomingJobData.quantity} dona jo'natildi`,
+              type: 'success',
+              related_table: 'jobs',
+            });
+          } else {
+            toast.success("Qo'shildi");
+          }
+        }
       }
       resetForm();
       setOpen(false);
       fetchData();
     } catch (error) {
+      console.error('Xatolik:', error);
       toast.error("Xatolik yuz berdi");
     }
   };
@@ -271,7 +358,7 @@ const OutgoingJobs = () => {
                 <TableBody>
                   {outgoingJobs.map((job, index) => (
                     <TableRow key={job.id}>
-                      <TableCell>{new Date(job.date).toLocaleDateString('uz-UZ')}</TableCell>
+                      <TableCell>{formatDateShort(job.date)}</TableCell>
                       <TableCell className="font-medium">{job.quantity_sent}</TableCell>
                       <TableCell>
                         <Badge variant="outline">{outgoingJobs.length - index}-marta</Badge>

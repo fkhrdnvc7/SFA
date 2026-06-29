@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Eye, DollarSign, Building2 } from "lucide-react";
+import { Plus, Edit, Eye, DollarSign, Building2, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -34,11 +34,14 @@ import { createNotification } from "@/lib/notifications";
 
 interface Employer {
   id: string;
-  name: string;
+  company_name: string;
+  first_name: string | null;
+  last_name: string | null;
   phone: string | null;
   address: string | null;
   notes: string | null;
   is_active: boolean;
+  user_id: string | null;
 }
 
 interface Transaction {
@@ -75,7 +78,8 @@ const Employers = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [transactionsLoading, setTransactionsLoading] = useState(false);
 
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
@@ -84,6 +88,8 @@ const Employers = () => {
   const [paymentAmount, setPaymentAmount] = useState("");
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0]);
   const [paymentNotes, setPaymentNotes] = useState("");
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [employerToDelete, setEmployerToDelete] = useState<Employer | null>(null);
 
   const isAdmin = profile?.role === "ADMIN";
 
@@ -102,7 +108,7 @@ const Employers = () => {
       const { data: employersData, error: empError } = await supabase
         .from("employers")
         .select("*")
-        .order("name");
+        .order("company_name");
 
       if (empError) throw empError;
 
@@ -163,7 +169,8 @@ const Employers = () => {
   };
 
   const resetForm = () => {
-    setName("");
+    setFirstName("");
+    setLastName("");
     setPhone("");
     setAddress("");
     setNotes("");
@@ -173,17 +180,21 @@ const Employers = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) {
-      toast.error("Ism majburiy");
+    if (!firstName.trim() && !lastName.trim()) {
+      toast.error("Ism yoki familya majburiy");
       return;
     }
+
+    const fullName = [firstName.trim(), lastName.trim()].filter(Boolean).join(' ');
 
     try {
       if (editingEmployer) {
         const { error } = await supabase
           .from("employers")
           .update({
-            name: name.trim(),
+            company_name: fullName,
+            first_name: firstName.trim() || null,
+            last_name: lastName.trim() || null,
             phone: phone || null,
             address: address || null,
             notes: notes || null,
@@ -194,7 +205,9 @@ const Employers = () => {
         toast.success("Ish beruvchi yangilandi");
       } else {
         const { error } = await supabase.from("employers").insert({
-          name: name.trim(),
+          company_name: fullName,
+          first_name: firstName.trim() || null,
+          last_name: lastName.trim() || null,
           phone: phone || null,
           address: address || null,
           notes: notes || null,
@@ -214,7 +227,8 @@ const Employers = () => {
 
   const handleEdit = (employer: Employer) => {
     setEditingEmployer(employer);
-    setName(employer.name);
+    setFirstName(employer.first_name || "");
+    setLastName(employer.last_name || "");
     setPhone(employer.phone || "");
     setAddress(employer.address || "");
     setNotes(employer.notes || "");
@@ -263,7 +277,7 @@ const Employers = () => {
 
       await createNotification({
         title: "Ish beruvchiga to'lov qilindi",
-        body: `${selectedEmployer.name} ga ${formatMoney(amount)} to'landi`,
+        body: `${selectedEmployer.company_name} ga ${formatMoney(amount)} to'landi`,
         type: "success",
         related_table: "employer_transactions",
       });
@@ -275,6 +289,45 @@ const Employers = () => {
     } catch {
       toast.error("To'lov saqlashda xatolik");
     }
+  };
+
+  const handleDelete = async () => {
+    if (!employerToDelete) return;
+
+    try {
+      // Check if employer has any transactions
+      const { data: transactions, error: txError } = await supabase
+        .from("employer_transactions")
+        .select("id")
+        .eq("employer_id", employerToDelete.id)
+        .limit(1);
+
+      if (txError) throw txError;
+
+      if (transactions && transactions.length > 0) {
+        toast.error("Bu ish beruvchining tranzaksiyalari mavjud. O'chirib bo'lmaydi.");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("employers")
+        .delete()
+        .eq("id", employerToDelete.id);
+
+      if (error) throw error;
+
+      toast.success("Ish beruvchi o'chirildi");
+      setDeleteOpen(false);
+      setEmployerToDelete(null);
+      fetchEmployers();
+    } catch {
+      toast.error("O'chirishda xatolik");
+    }
+  };
+
+  const openDeleteDialog = (employer: Employer) => {
+    setEmployerToDelete(employer);
+    setDeleteOpen(true);
   };
 
   const detailStats = useMemo(() => {
@@ -325,9 +378,15 @@ const Employers = () => {
                   <DialogDescription>Ish beruvchi ma'lumotlarini kiriting</DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Ism *</Label>
-                    <Input value={name} onChange={(e) => setName(e.target.value)} required />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Ism *</Label>
+                      <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Familya</Label>
+                      <Input value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label>Telefon</Label>
@@ -366,7 +425,14 @@ const Employers = () => {
               <Card key={emp.id} className="flex flex-col">
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg">{emp.name}</CardTitle>
+                    <div>
+                      <CardTitle className="text-lg">{emp.company_name}</CardTitle>
+                      {(emp.first_name || emp.last_name) && (
+                        <p className="text-sm font-medium text-muted-foreground mt-1">
+                          {[emp.first_name, emp.last_name].filter(Boolean).join(' ')}
+                        </p>
+                      )}
+                    </div>
                     <Badge variant={emp.is_active ? "default" : "secondary"}>
                       {emp.is_active ? "Aktiv" : "Noaktiv"}
                     </Badge>
@@ -401,9 +467,14 @@ const Employers = () => {
                       To'lov
                     </Button>
                     {isAdmin && (
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(emp)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                      <>
+                        <Button variant="ghost" size="icon" onClick={() => handleEdit(emp)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => openDeleteDialog(emp)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </CardContent>
@@ -416,7 +487,12 @@ const Employers = () => {
         <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{selectedEmployer?.name} — Moliyaviy hisob</DialogTitle>
+              <DialogTitle>{selectedEmployer?.company_name} — Moliyaviy hisob</DialogTitle>
+              {(selectedEmployer?.first_name || selectedEmployer?.last_name) && (
+                <DialogDescription>
+                  {[selectedEmployer.first_name, selectedEmployer.last_name].filter(Boolean).join(' ')}
+                </DialogDescription>
+              )}
             </DialogHeader>
             <div className="grid gap-4 sm:grid-cols-3">
               <Card>
@@ -492,7 +568,14 @@ const Employers = () => {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>To'lov qo'shish</DialogTitle>
-              <DialogDescription>{selectedEmployer?.name}</DialogDescription>
+              <DialogDescription>
+                {selectedEmployer?.company_name}
+                {(selectedEmployer?.first_name || selectedEmployer?.last_name) && (
+                  <span className="block text-sm">
+                    {[selectedEmployer.first_name, selectedEmployer.last_name].filter(Boolean).join(' ')}
+                  </span>
+                )}
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handlePayment} className="space-y-4">
               <div className="rounded-lg bg-muted p-3">
@@ -522,6 +605,26 @@ const Employers = () => {
               </div>
               <Button type="submit" className="w-full">Saqlash</Button>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Ish beruvchini o'chirish</DialogTitle>
+              <DialogDescription>
+                Haqiqatan ham <span className="font-semibold">{employerToDelete?.company_name}</span> ni o'chirmoqchimisiz? Bu amalni qaytarib bo'lmaydi.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setDeleteOpen(false)}>
+                Bekor qilish
+              </Button>
+              <Button variant="destructive" onClick={handleDelete}>
+                O'chirish
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

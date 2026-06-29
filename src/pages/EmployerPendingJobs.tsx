@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import Layout from "@/components/Layout";
@@ -51,20 +51,7 @@ const EmployerPendingJobs = () => {
   });
   const [employerId, setEmployerId] = useState<string | null>(null);
 
-  // Set up real-time updates
-  useIncomingJobsRealtime(employerId || undefined, fetchJobs);
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate("/auth");
-    } else if (profile && profile.role !== 'ISH_BERUVCHI') {
-      navigate("/dashboard");
-    } else if (profile && profile.role === 'ISH_BERUVCHI') {
-      fetchJobs();
-    }
-  }, [user, profile, loading, navigate]);
-
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     try {
       // Get employer ID first
       const { data: employerData } = await supabase
@@ -92,7 +79,20 @@ const EmployerPendingJobs = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  // Set up real-time updates
+  useIncomingJobsRealtime(employerId || undefined, fetchJobs);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth");
+    } else if (profile && profile.role !== 'ISH_BERUVCHI') {
+      navigate("/dashboard");
+    } else if (profile && profile.role === 'ISH_BERUVCHI') {
+      fetchJobs();
+    }
+  }, [user, profile, loading, navigate, fetchJobs]);
 
   const handleApprovalClick = (job: IncomingJob) => {
     setSelectedJob(job);

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SFA Tailoring - Mobile Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#b4c5ff",
+                        "error": "#ffb4ab",
+                        "surface-tint": "#b4c5ff",
+                        "surface-container-low": "#111c2d",
+                        "surface-bright": "#2f3a4c",
+                        "surface-dim": "#081425",
+                        "secondary": "#7bd0ff",
+                        "secondary-fixed-dim": "#7bd0ff",
+                        "on-background": "#d8e3fb",
+                        "outline": "#8d90a0",
+                        "secondary-fixed": "#c4e7ff",
+                        "on-secondary-fixed-variant": "#004c69",
+                        "background": "#081425",
+                        "tertiary": "#c0c1ff",
+                        "on-error": "#690005",
+                        "on-primary-fixed": "#00174b",
+                        "on-tertiary-fixed-variant": "#2f2ebe",
+                        "inverse-on-surface": "#263143",
+                        "surface-variant": "#2a3548",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "on-surface-variant": "#c3c6d7",
+                        "primary-fixed": "#dbe1ff",
+                        "on-secondary-fixed": "#001e2c",
+                        "surface-container-high": "#1f2a3c",
+                        "on-surface": "#d8e3fb",
+                        "on-secondary": "#00354a",
+                        "surface": "#081425",
+                        "outline-variant": "#434655",
+                        "surface-container": "#152031",
+                        "tertiary-fixed": "#e1e0ff",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#c0c1ff",
+                        "tertiary-container": "#585be6",
+                        "on-tertiary-container": "#f1eeff",
+                        "on-secondary-container": "#00374d",
+                        "surface-container-highest": "#2a3548",
+                        "inverse-surface": "#d8e3fb",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-primary-container": "#eeefff",
+                        "on-tertiary": "#1000a9",
+                        "on-tertiary-fixed": "#07006c",
+                        "inverse-primary": "#0053db",
+                        "on-primary": "#002a78",
+                        "surface-container-lowest": "#040e1f",
+                        "error-container": "#93000a",
+                        "secondary-container": "#00a6e0",
+                        "primary-container": "#2563eb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-sm": "16px",
+                        "bento-gap": "16px",
+                        "margin-lg": "32px",
+                        "unit": "4px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-caps": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            overscroll-behavior-y: none;
+        }
+
+        .glass-panel {
+            background: theme('colors.surface-container/60');
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.4);
+        }
+
+        .glass-button {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease-out;
+        }
+
+        .glass-button:active {
+            transform: scale(0.97);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Hide scrollbar for clean mobile look */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Entry Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .stagger-1 { animation: fadeSlideUp 0.4s ease-out 0.1s both; }
+        .stagger-2 { animation: fadeSlideUp 0.4s ease-out 0.25s both; }
+        .stagger-3 { animation: fadeSlideUp 0.4s ease-out 0.4s both; }
+        .stagger-4 { animation: fadeSlideUp 0.4s ease-out 0.55s both; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar (Mobile Shell) -->
+<header class="flex justify-between items-center w-full px-margin-sm h-16 sticky top-0 z-40 bg-surface-dim/40 backdrop-blur-lg border-b border-white/10 shadow-sm transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/20">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A highly detailed close-up portrait of a professional tailor in a modern workshop, lit by cinematic studio lights. Deep shadows and cool blue-toned highlights reflect a premium, technical aesthetic, perfectly framing the subject against a sleek, dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPWBdgAkBluVWN9PTGq8iqov7YHezACsn-rb6OpqV7WPl0Eb_wfb2ZBSuGd87p0c69oAKmqQB5hkY6hOO9BahxaJrcG4-npH2bNQHbaWaec0soTkoiY9qcR3n5Hnm02DC27aD1HfTTNNiLH4UROKpIr8r5pIgIIm9ekb5qOqYRIQ_Y37sCXcTik0baFp_NpaQJHWaLsRSh_yj0YTgVX7UmmUxhM5PgIIpTWr6ADvVBEJKKZ-DWrkLN"/>
+</div>
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-semibold text-primary">SFA Tailoring</span>
+</div>
+<div class="flex items-center gap-2">
+<button aria-label="Notifications" class="w-10 h-10 flex items-center justify-center rounded-full glass-button text-on-surface-variant hover:text-primary transition-colors Active: opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas (Bento Grid 1-Col Mobile) -->
+<main class="flex-1 overflow-y-auto px-margin-sm pt-bento-gap pb-24 space-y-bento-gap">
+<!-- Priority Stats Row -->
+<div class="grid grid-cols-2 gap-bento-gap stagger-1">
+<!-- Active Orders -->
+<div class="glass-panel rounded-xl p-4 flex flex-col justify-between h-32 active:scale-[0.98] transition-transform">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-secondary" data-icon="reorder" style="font-variation-settings: 'FILL' 1;">reorder</span>
+<span class="bg-secondary/10 text-secondary font-label-caps text-label-caps px-2 py-1 rounded-full border border-secondary/20">+3 New</span>
+</div>
+<div>
+<div class="font-display-lg text-display-lg text-on-surface">24</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Active Orders</div>
+</div>
+</div>
+<!-- Tasks -->
+<div class="glass-panel rounded-xl p-4 flex flex-col justify-between h-32 active:scale-[0.98] transition-transform">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-tertiary" data-icon="assignment" style="font-variation-settings: 'FILL' 1;">assignment</span>
+<span class="bg-error/10 text-error font-label-caps text-label-caps px-2 py-1 rounded-full border border-error/20">2 Urgent</span>
+</div>
+<div>
+<div class="font-display-lg text-display-lg text-on-surface">12</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Pending Tasks</div>
+</div>
+</div>
+</div>
+<!-- Quick Actions Bento -->
+<div class="glass-panel rounded-xl p-5 stagger-2">
+<h2 class="font-title-md text-title-md text-on-surface mb-4">Quick Actions</h2>
+<div class="grid grid-cols-4 gap-4">
+<button class="flex flex-col items-center gap-2 active:scale-95 transition-transform">
+<div class="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">New Order</span>
+</button>
+<button class="flex flex-col items-center gap-2 active:scale-95 transition-transform">
+<div class="w-12 h-12 rounded-full bg-surface-bright border border-white/10 flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="qr_code_scanner">qr_code_scanner</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Scan</span>
+</button>
+<button class="flex flex-col items-center gap-2 active:scale-95 transition-transform">
+<div class="w-12 h-12 rounded-full bg-surface-bright border border-white/10 flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="styler">styler</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Patterns</span>
+</button>
+<button class="flex flex-col items-center gap-2 active:scale-95 transition-transform">
+<div class="w-12 h-12 rounded-full bg-surface-bright border border-white/10 flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Stock</span>
+</button>
+</div>
+</div>
+<!-- Recent Activity Feed Bento -->
+<div class="glass-panel rounded-xl p-5 stagger-3 flex-1">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-title-md text-title-md text-on-surface">Recent Activity</h2>
+<button class="text-primary font-body-sm text-body-sm hover:underline">View All</button>
+</div>
+<div class="space-y-4">
+<!-- Activity Item 1 -->
+<div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors active:bg-white/10">
+<div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary shrink-0 border border-secondary/20">
+<span class="material-symbols-outlined" data-icon="cut">cut</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-body-sm text-body-sm text-on-surface truncate">Order #A-7841 Cutting Started</p>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-1">10 mins ago • Jacket</p>
+</div>
+</div>
+<div class="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+<!-- Activity Item 2 -->
+<div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors active:bg-white/10">
+<div class="w-10 h-10 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary shrink-0 border border-tertiary/20">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-body-sm text-body-sm text-on-surface truncate">Batch #092 Dispatched</p>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-1">1 hr ago • 5 items</p>
+</div>
+</div>
+<div class="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+<!-- Activity Item 3 -->
+<div class="flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors active:bg-white/10">
+<div class="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center text-error shrink-0 border border-error/20">
+<span class="material-symbols-outlined" data-icon="warning">warning</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-body-sm text-body-sm text-on-surface truncate">Fabric Shortage Alert: Silk</p>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-1">2 hrs ago • Inventory</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Shell) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex lg:hidden justify-around items-center px-4 py-2 bg-surface-container-low/80 backdrop-blur-2xl docked full-width bottom-0 rounded-t-xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
+<!-- Active Tab: Home -->
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-3 py-1 font-label-caps text-label-caps active:bg-surface-bright tap-highlight-transparent transition-all">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="mt-1">Home</span>
+</button>
+<!-- Inactive Tab: Orders -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant font-label-caps text-label-caps active:bg-surface-bright tap-highlight-transparent rounded-xl px-3 py-1 transition-all hover:text-on-surface">
+<span class="material-symbols-outlined" data-icon="reorder">reorder</span>
+<span class="mt-1">Orders</span>
+</button>
+<!-- Inactive Tab: Tasks -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant font-label-caps text-label-caps active:bg-surface-bright tap-highlight-transparent rounded-xl px-3 py-1 transition-all hover:text-on-surface">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="mt-1">Tasks</span>
+</button>
+<!-- Inactive Tab: Profile -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant font-label-caps text-label-caps active:bg-surface-bright tap-highlight-transparent rounded-xl px-3 py-1 transition-all hover:text-on-surface">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="mt-1">Profile</span>
+</button>
+</nav>
+<script>
+        // Micro-interactions for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('touchstart', () => {
+                btn.style.transform = 'scale(0.95)';
+            }, {passive: true});
+            
+            btn.addEventListener('touchend', () => {
+                btn.style.transform = 'scale(1)';
+            }, {passive: true});
+            
+            btn.addEventListener('touchcancel', () => {
+                btn.style.transform = 'scale(1)';
+            }, {passive: true});
+        });
+    </script>
+</body></html>

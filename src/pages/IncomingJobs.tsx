@@ -16,10 +16,13 @@ import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { createNotification } from "@/lib/notifications";
+import { formatDateShort } from "@/lib/dateFormat";
 
 interface Employer {
   id: string;
-  name: string;
+  company_name: string;
+  first_name: string | null;
+  last_name: string | null;
 }
 
 interface IncomingJob {
@@ -35,7 +38,7 @@ interface IncomingJob {
   client_price_per_unit?: number | null;
   approval_status?: string | null;
   employer_price_per_unit?: number | null;
-  employers?: { name: string } | null;
+  employer?: { id: string; company_name: string; first_name: string | null; last_name: string | null } | null;
   outgoing_jobs?: { quantity_sent: number }[];
 }
 
@@ -71,13 +74,22 @@ const IncomingJobs = () => {
     try {
       const { data, error } = await supabase
         .from('employers')
-        .select('id, name')
-        .eq('is_active', true)
-        .order('name');
-      if (error) throw error;
-      setEmployers(data || []);
-    } catch {
-      console.error('Ish beruvchilarni yuklashda xatolik');
+        .select('id, company_name, first_name, last_name, is_active')
+        .order('company_name');
+
+      if (error) {
+        console.error('Employers fetch error:', error);
+        toast.error('Ish beruvchilarni yuklashda xatolik');
+        return;
+      }
+
+      console.log('All employers from DB:', data);
+      const activeEmployers = (data || []).filter(emp => emp.is_active);
+      console.log('Active employers:', activeEmployers);
+      setEmployers(activeEmployers);
+    } catch (error) {
+      console.error('Ish beruvchilarni yuklashda xatolik:', error);
+      toast.error('Ish beruvchilarni yuklashda xatolik');
     }
   };
 
@@ -87,7 +99,12 @@ const IncomingJobs = () => {
         .from('incoming_jobs')
         .select(`
           *,
-          employers (name),
+          employer:employers!employer_id (
+            id,
+            company_name,
+            first_name,
+            last_name
+          ),
           outgoing_jobs (quantity_sent)
         `)
         .order('date', { ascending: false })
@@ -159,7 +176,7 @@ const IncomingJobs = () => {
           // Get employer's user_id for notification
           const { data: employerData } = await supabase
             .from('employers')
-            .select('user_id, name')
+            .select('user_id, company_name')
             .eq('id', employerId)
             .single();
 
@@ -178,11 +195,26 @@ const IncomingJobs = () => {
           // Send notification to all admins/managers
           await createNotification({
             title: 'Yangi ish qabul qilindi',
-            body: `${jobName} — ${qty} dona ${selectedEmployer?.name || 'ish beruvchi'} dan qabul qilindi`,
+            body: `${jobName} — ${qty} dona ${selectedEmployer?.company_name || 'ish beruvchi'} dan qabul qilindi`,
             type: 'info',
             related_table: 'incoming_jobs',
             related_id: newJob.id,
           });
+
+          // Create job in Jobs table for tracking
+          const { error: jobError } = await supabase
+            .from('jobs')
+            .insert({
+              job_name: jobName,
+              created_by: user!.id,
+              status: 'ochiq',
+              incoming_job_id: newJob.id,
+              notes: `Ish beruvchi: ${selectedEmployer?.company_name || "Noma'lum"}. ${notes ? `Izoh: ${notes}` : ''}`,
+            });
+
+          if (jobError) {
+            console.error('Jobs jadvaliga qo\'shishda xatolik:', jobError);
+          }
         }
 
         toast.success("Qo'shildi");
@@ -295,9 +327,17 @@ const IncomingJobs = () => {
                       <SelectValue placeholder="Ish beruvchini tanlang" />
                     </SelectTrigger>
                     <SelectContent>
-                      {employers.map((emp) => (
-                        <SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>
-                      ))}
+                      {employers.length === 0 ? (
+                        <div className="p-2 text-sm text-muted-foreground">
+                          Ish beruvchilar topilmadi
+                        </div>
+                      ) : (
+                        employers.map((emp) => (
+                          <SelectItem key={emp.id} value={emp.id}>
+                            {emp.company_name}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -312,41 +352,12 @@ const IncomingJobs = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Birlik narxi (mijozdan)</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={clientPricePerUnit}
-                    onChange={(e) => setClientPricePerUnit(e.target.value)}
-                    placeholder="0"
-                  />
-                </div>
-                <div className="space-y-2">
                   <Label>Sana *</Label>
                   <Input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
                     required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Yaroqsiz kiyimlar soni</Label>
-                  <Input
-                    type="number"
-                    value={defectiveItems}
-                    onChange={(e) => setDefectiveItems(e.target.value)}
-                    placeholder="0"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Ortiqcha ish</Label>
-                  <Input
-                    type="number"
-                    value={extraWork}
-                    onChange={(e) => setExtraWork(e.target.value)}
-                    placeholder="0"
                   />
                 </div>
                 <div className="space-y-2">
@@ -400,9 +411,9 @@ const IncomingJobs = () => {
                       const remaining = job.quantity - totalSent;
                       return (
                         <TableRow key={job.id}>
-                          <TableCell>{new Date(job.date).toLocaleDateString('uz-UZ')}</TableCell>
+                          <TableCell>{formatDateShort(job.date)}</TableCell>
                           <TableCell className="font-medium">{job.job_name}</TableCell>
-                          <TableCell>{job.employers?.name || "—"}</TableCell>
+                          <TableCell>{job.employer?.company_name || "—"}</TableCell>
                           <TableCell>{job.quantity}</TableCell>
                           <TableCell>{totalSent}</TableCell>
                           <TableCell>{remaining}</TableCell>
