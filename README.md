@@ -1,4 +1,4 @@
-# Sartarosh Biznes Uchun
+# Tikuvchilik Biznes Uchun
 
 ## Project info
 
