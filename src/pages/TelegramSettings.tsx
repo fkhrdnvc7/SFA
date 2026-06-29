@@ -127,6 +127,8 @@ const TelegramSettings = () => {
     setSettingWebhook(true);
     try {
       const webhookUrl = `${supabaseUrl}/functions/v1/hyper-action`;
+      console.log("Setting webhook to:", webhookUrl);
+
       const response = await fetch(
         `https://api.telegram.org/bot${botToken.trim()}/setWebhook`,
         {
@@ -139,11 +141,22 @@ const TelegramSettings = () => {
         },
       );
       const result = await response.json();
-      if (!result.ok) throw new Error(result.description || "Webhook o'rnatilmadi");
-      toast.success("Webhook muvaffaqiyatli o'rnatildi");
+      console.log("Webhook response:", result);
+
+      if (!result.ok) {
+        throw new Error(result.description || "Webhook o'rnatilmadi");
+      }
+
+      // Check if webhook was actually set or deleted
+      if (result.description && result.description.includes("deleted")) {
+        throw new Error("Webhook o'chirildi. Function deploy qilinganligini tekshiring.");
+      }
+
+      toast.success(`Webhook o'rnatildi: ${webhookUrl}`);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Webhook o'rnatishda xatolik";
       toast.error(message);
+      console.error("Webhook error:", err);
     } finally {
       setSettingWebhook(false);
     }
