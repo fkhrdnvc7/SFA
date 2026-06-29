@@ -42,6 +42,7 @@ interface Profile {
   is_active: boolean;
   created_at: string;
   last_login?: string;
+  telegram_chat_id?: string;
 }
 
 const Users = () => {
@@ -56,6 +57,7 @@ const Users = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("SEAMSTRESS");
+  const [telegramChatId, setTelegramChatId] = useState("");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -98,7 +100,8 @@ const Users = () => {
           emailRedirectTo: redirectUrl,
           data: {
             full_name: fullName,
-            role: role
+            role: role,
+            telegram_chat_id: telegramChatId || null
           }
         }
       });
@@ -110,6 +113,7 @@ const Users = () => {
       setPassword("");
       setFullName("");
       setRole("SEAMSTRESS");
+      setTelegramChatId("");
       setOpen(false);
       fetchUsers();
     } catch (error: any) {
@@ -227,6 +231,18 @@ const Users = () => {
                       <SelectItem value="ADMIN">Administrator</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="telegram">Telegram Chat ID (ixtiyoriy)</Label>
+                  <Input
+                    id="telegram"
+                    value={telegramChatId}
+                    onChange={(e) => setTelegramChatId(e.target.value)}
+                    placeholder="123456789"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Tikuvchi Telegram bot orqali o'z ishini ko'rishi uchun. @userinfobot dan chat ID olish mumkin.
+                  </p>
                 </div>
                 <Button type="submit" className="w-full">
                   Yaratish
