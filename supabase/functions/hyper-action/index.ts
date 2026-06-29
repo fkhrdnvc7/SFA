@@ -12,12 +12,23 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  console.log("📨 Webhook request received");
+
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
   );
 
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch (e) {
+    console.error("❌ Failed to parse body:", e);
+    return new Response("Invalid JSON", { status: 400, headers: corsHeaders });
+  }
+
+  console.log("📦 Body received:", JSON.stringify(body).substring(0, 200));
+
   const message = body?.message;
   const callbackQuery = body?.callback_query;
 
