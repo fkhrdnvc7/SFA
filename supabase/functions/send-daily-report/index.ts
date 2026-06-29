@@ -100,20 +100,32 @@ async function generateFullDailyReport(
 ): Promise<string> {
   const today = new Date().toISOString().split("T")[0];
 
-  const { data: incomingJobs } = await supabase
+  const { data: incomingJobs, error: jobsError } = await supabase
     .from("incoming_jobs")
     .select("*, employers(name)")
     .eq("date", today);
 
-  const { data: payments } = await supabase
+  if (jobsError) {
+    console.error("Error fetching incoming jobs:", jobsError);
+  }
+
+  const { data: payments, error: paymentsError } = await supabase
     .from("employer_transactions")
     .select("*, employers(name)")
     .eq("transaction_type", "payment")
     .eq("transaction_date", today);
 
-  const { data: allDebts } = await supabase
+  if (paymentsError) {
+    console.error("Error fetching payments:", paymentsError);
+  }
+
+  const { data: allDebts, error: debtsError } = await supabase
     .from("employer_transactions")
     .select("transaction_type, total_amount");
+
+  if (debtsError) {
+    console.error("Error fetching debts:", debtsError);
+  }
 
   const totalReceived =
     allDebts
