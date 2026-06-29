@@ -162,6 +162,59 @@ const TelegramSettings = () => {
     }
   };
 
+  const handleGetWebhookInfo = async () => {
+    if (!botToken.trim()) {
+      toast.error("Avval bot token kiriting");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://api.telegram.org/bot${botToken.trim()}/getWebhookInfo`,
+      );
+      const result = await response.json();
+      console.log("Webhook info:", result);
+
+      if (result.ok && result.result) {
+        const info = result.result;
+        alert(
+          `Webhook Info:\n\n` +
+          `URL: ${info.url || "Not set"}\n` +
+          `Pending updates: ${info.pending_update_count || 0}\n` +
+          `Last error: ${info.last_error_message || "None"}\n` +
+          `Last error date: ${info.last_error_date ? new Date(info.last_error_date * 1000).toLocaleString() : "None"}`
+        );
+      }
+    } catch (err) {
+      toast.error("Webhook info olishda xatolik");
+      console.error(err);
+    }
+  };
+
+  const handleDeleteWebhook = async () => {
+    if (!botToken.trim()) {
+      toast.error("Avval bot token kiriting");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://api.telegram.org/bot${botToken.trim()}/deleteWebhook`,
+        { method: "POST" }
+      );
+      const result = await response.json();
+
+      if (result.ok) {
+        toast.success("Webhook o'chirildi");
+      } else {
+        toast.error("Webhook o'chirishda xatolik");
+      }
+    } catch (err) {
+      toast.error("Webhook o'chirishda xatolik");
+      console.error(err);
+    }
+  };
+
   if (loading || isLoading) {
     return (
       <Layout>
@@ -265,6 +318,20 @@ const TelegramSettings = () => {
                 <Webhook className="mr-2 h-4 w-4" />
               )}
               Webhook o'rnatish
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleGetWebhookInfo}
+              className="flex-1"
+            >
+              Info
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleDeleteWebhook}
+              className="flex-1"
+            >
+              O'chirish
             </Button>
           </CardContent>
         </Card>
