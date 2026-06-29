@@ -3,64 +3,96 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
-
-  const { data: settings } = await supabase
-    .from("telegram_settings")
-    .select("*")
-    .eq("is_active", true)
-    .single();
-
-  if (!settings) {
-    return new Response("No Telegram settings configured", {
-      status: 404,
-      headers: corsHeaders,
-    });
-  }
-
-  const report = await generateFullDailyReport(supabase);
-
-  const response = await fetch(
-    `https://api.telegram.org/bot${settings.bot_token}/sendMessage`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: settings.admin_chat_id,
-        text: report,
-        parse_mode: "HTML",
-      }),
-    },
-  );
-
-  if (response.ok) {
-    await supabase.from("notifications").insert({
-      title: "Telegram hisobot yuborildi",
-      body: "Kunlik hisobot administratorga Telegram orqali yuborildi",
-      type: "success",
-    });
-    return new Response("Report sent successfully", {
+    return new Response(null, {
       status: 200,
-      headers: corsHeaders,
+      headers: corsHeaders
     });
   }
 
-  return new Response("Failed to send report", {
-    status: 500,
-    headers: corsHeaders,
-  });
+  try {
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
+    const { data: settings, error: settingsError } = await supabase
+      .from("telegram_settings")
+      .select("*")
+      .eq("is_active", true)
+      .single();
+
+    if (settingsError || !settings) {
+      return new Response(
+        JSON.stringify({
+          error: "No active Telegram settings found",
+          details: settingsError?.message
+        }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const report = await generateFullDailyReport(supabase);
+
+    const response = await fetch(
+      `https://api.telegram.org/bot${settings.bot_token}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: settings.admin_chat_id,
+          text: report,
+          parse_mode: "HTML",
+        }),
+      },
+    );
+
+    const telegramResult = await response.json();
+
+    if (response.ok) {
+      await supabase.from("notifications").insert({
+        title: "Telegram hisobot yuborildi",
+        body: "Kunlik hisobot administratorga Telegram orqali yuborildi",
+        type: "success",
+      });
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: "Report sent successfully"
+        }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(
+      JSON.stringify({
+        error: "Failed to send report to Telegram",
+        details: telegramResult
+      }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error in send-daily-report:", error);
+    return new Response(
+      JSON.stringify({
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : String(error)
+      }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 });
 
 async function generateFullDailyReport(
