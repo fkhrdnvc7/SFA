@@ -126,7 +126,7 @@ const TelegramSettings = () => {
 
     setSettingWebhook(true);
     try {
-      const webhookUrl = `${supabaseUrl}/functions/v1/telegram-webhook`;
+      const webhookUrl = `${supabaseUrl}/functions/v1/hyper-action`;
       const response = await fetch(
         `https://api.telegram.org/bot${botToken.trim()}/setWebhook`,
         {
