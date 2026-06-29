@@ -7,7 +7,7 @@
 --   '0 3 * * *',
 --   $$
 --     SELECT net.http_post(
---       url := 'https://YOUR_PROJECT.supabase.co/functions/v1/send-daily-report',
+--       url := 'https://YOUR_PROJECT.supabase.co/functions/v1/smart-task',
 --       headers := '{"Authorization": "Bearer YOUR_ANON_KEY", "Content-Type": "application/json"}'::jsonb,
 --       body := '{}'::jsonb
 --     )
@@ -15,5 +15,5 @@
 -- );
 
 -- Yoki Supabase Dashboard > Edge Functions > Cron orqali:
--- URL: https://YOUR_PROJECT.supabase.co/functions/v1/send-daily-report
+-- URL: https://YOUR_PROJECT.supabase.co/functions/v1/smart-task
 -- Schedule: 0 3 * * *  (UTC 03:00 = Toshkent 08:00)

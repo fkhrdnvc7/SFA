@@ -108,7 +108,7 @@ const TelegramSettings = () => {
   const handleSendReport = async () => {
     setSendingReport(true);
     try {
-      const { error } = await supabase.functions.invoke("send-daily-report");
+      const { error } = await supabase.functions.invoke("smart-task");
       if (error) throw error;
       toast.success("Hisobot yuborildi");
     } catch {
