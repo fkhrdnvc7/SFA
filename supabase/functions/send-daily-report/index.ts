@@ -9,8 +9,11 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  console.log("📨 Request received:", req.method);
+
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    console.log("✅ CORS preflight handled");
     return new Response(null, {
       status: 200,
       headers: corsHeaders
@@ -18,30 +21,62 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
+    console.log("🔧 Creating Supabase client...");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
+    if (!supabaseUrl || !supabaseKey) {
+      console.error("❌ Missing environment variables");
+      return new Response(
+        JSON.stringify({
+          error: "Server configuration error",
+          details: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY"
+        }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    console.log("✅ Supabase client created");
+
+    console.log("📡 Fetching telegram settings...");
     const { data: settings, error: settingsError } = await supabase
       .from("telegram_settings")
       .select("*")
       .eq("is_active", true)
       .single();
 
-    if (settingsError || !settings) {
+    if (settingsError) {
+      console.error("❌ Error fetching settings:", settingsError);
       return new Response(
         JSON.stringify({
           error: "No active Telegram settings found",
-          details: settingsError?.message
+          details: settingsError.message
         }), {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const report = await generateFullDailyReport(supabase);
+    if (!settings) {
+      console.error("❌ No settings found");
+      return new Response(
+        JSON.stringify({
+          error: "No active Telegram settings found",
+          details: "Please activate telegram settings in the database"
+        }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
+    console.log("✅ Settings found");
+    console.log("📊 Generating report...");
+    const report = await generateFullDailyReport(supabase);
+    console.log("✅ Report generated, length:", report.length);
+
+    console.log("📤 Sending to Telegram...");
     const response = await fetch(
       `https://api.telegram.org/bot${settings.bot_token}/sendMessage`,
       {
@@ -56,8 +91,10 @@ serve(async (req) => {
     );
 
     const telegramResult = await response.json();
+    console.log("📬 Telegram response:", response.status, telegramResult);
 
     if (response.ok) {
+      console.log("✅ Message sent successfully");
       await supabase.from("notifications").insert({
         title: "Telegram hisobot yuborildi",
         body: "Kunlik hisobot administratorga Telegram orqali yuborildi",
@@ -74,6 +111,7 @@ serve(async (req) => {
       });
     }
 
+    console.error("❌ Failed to send to Telegram:", telegramResult);
     return new Response(
       JSON.stringify({
         error: "Failed to send report to Telegram",
@@ -83,11 +121,13 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error in send-daily-report:", error);
+    console.error("💥 Fatal error in send-daily-report:", error);
+    console.error("Stack trace:", error instanceof Error ? error.stack : "No stack trace");
     return new Response(
       JSON.stringify({
         error: "Internal server error",
-        details: error instanceof Error ? error.message : String(error)
+        details: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
       }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
