@@ -157,10 +157,15 @@ serve(async (req) => {
   if (message) {
     const chatId = message.chat.id.toString();
     const text = message.text || "";
+    console.log(`💬 Message from ${chatId}: "${text}"`);
 
     if (text === "/start" || text === "/menu") {
+      console.log("🔑 Handling /start or /menu command");
       const profile = await getUserProfile(chatId);
+      console.log("👤 Profile:", profile ? profile.full_name : "Not found");
+
       const keyboard = getMenuKeyboard(profile?.role);
+      console.log("⌨️ Keyboard generated:", JSON.stringify(keyboard));
 
       let welcomeText = `<b>🏭 SFA Tailoring Bot</b>\n\n`;
       if (profile) {
@@ -179,7 +184,9 @@ serve(async (req) => {
       }
       welcomeText += `Quyidagi bo'limlardan birini tanlang:`;
 
+      console.log("📤 Sending message with keyboard...");
       await sendMessage(chatId, welcomeText, keyboard);
+      console.log("✅ Message sent successfully");
     }
   }
 
