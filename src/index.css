@@ -10,31 +10,31 @@
 
 @layer base {
   :root {
-    /* Carbon Base */
-    --background: 0 0% 9%;              /* #171717 */
+    /* Dark Teal Theme - Professional Ocean Aesthetic */
+    --background: 192 100% 8%;          /* #002029 - ink-black */
     --foreground: 0 0% 100%;            /* #ffffff */
 
     /* Glass Surfaces */
-    --card: 0 0% 9%;                    /* #171717 base for glass */
+    --card: 196 100% 12%;               /* #00303d - jet-black */
     --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 11%;
+    --popover: 196 100% 12%;            /* #00303d - jet-black */
     --popover-foreground: 0 0% 100%;
 
-    /* Primary (Professional Blue) */
-    --primary: 221 83% 53%;             /* #2563eb */
+    /* Primary (Teal Accent) */
+    --primary: 196 100% 24%;            /* #00607a - dark-teal-3 */
     --primary-foreground: 0 0% 100%;
 
     /* Secondary */
-    --secondary: 217 91% 60%;           /* #3b82f6 */
+    --secondary: 196 100% 20%;          /* #005066 - dark-teal-2 */
     --secondary-foreground: 0 0% 100%;
 
     /* Muted / Variants */
-    --muted: 240 5% 26%;                /* #3f3f46 */
-    --muted-foreground: 240 5% 65%;     /* #a1a1aa */
+    --muted: 196 100% 16%;              /* #004052 - dark-teal */
+    --muted-foreground: 180 20% 70%;    /* lighter teal for text */
 
     /* Accent */
-    --accent: 240 6% 10%;
+    --accent: 196 100% 20%;             /* #005066 - dark-teal-2 */
     --accent-foreground: 0 0% 100%;
 
     /* Destructive */
@@ -42,9 +42,9 @@
     --destructive-foreground: 0 0% 100%;
 
     /* Borders */
-    --border: 240 4% 16%;               /* #27272a */
-    --input: 240 4% 16%;
-    --ring: 221 83% 53%;
+    --border: 196 100% 16%;             /* #004052 - dark-teal */
+    --input: 196 100% 16%;              /* #004052 - dark-teal */
+    --ring: 196 100% 24%;               /* #00607a - dark-teal-3 */
 
     /* Success & Warning */
     --success: 142 71% 45%;             /* #10b981 */
@@ -53,14 +53,14 @@
     --warning-foreground: 0 0% 100%;
 
     /* Sidebar (Glass) */
-    --sidebar-background: 0 0% 9%;
+    --sidebar-background: 192 100% 8%;  /* #002029 - ink-black */
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary: 196 100% 24%;    /* #00607a - dark-teal-3 */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 6% 10%;
+    --sidebar-accent: 196 100% 20%;     /* #005066 - dark-teal-2 */
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 0 0% 100%;        /* Will use with opacity */
-    --sidebar-ring: 221 83% 53%;
+    --sidebar-border: 196 100% 16%;     /* #004052 - dark-teal */
+    --sidebar-ring: 196 100% 24%;       /* #00607a - dark-teal-3 */
 
     /* Border radius */
     --radius: 0.75rem;                  /* 12px */
@@ -177,13 +177,13 @@
     scrollbar-width: none;
   }
 
-  /* Glass Card Effect */
+  /* Glass Card Effect - Teal Ocean Theme */
   .glass-card {
-    background-color: rgba(24, 24, 27, 0.6);
+    background-color: rgba(0, 48, 61, 0.6);     /* jet-black with transparency */
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 96, 122, 0.2);    /* dark-teal-3 border */
+    box-shadow: 0 8px 32px 0 rgba(0, 32, 41, 0.5);
     border-radius: 1rem;
   }
 
@@ -194,24 +194,25 @@
   }
 
   .glass-card-hover {
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
   }
 
   .glass-card-hover:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+    box-shadow: 0 12px 40px 0 rgba(0, 96, 122, 0.3);    /* dark-teal-3 glow */
+    border-color: rgba(0, 96, 122, 0.4);
   }
 
   .light .glass-card-hover:hover {
     box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
   }
 
-  /* Glass Sidebar */
+  /* Glass Sidebar - Deep Ocean */
   .glass-sidebar {
-    background-color: rgba(23, 23, 23, 0.8);
+    background-color: rgba(0, 32, 41, 0.85);    /* ink-black with high opacity */
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: 1px solid rgba(0, 80, 102, 0.3);  /* dark-teal-2 border */
   }
 
   .light .glass-sidebar {
@@ -219,12 +220,12 @@
     border-right: 1px solid rgba(0, 0, 0, 0.05);
   }
 
-  /* Glass Header */
+  /* Glass Header - Deep Ocean */
   .glass-header {
-    background-color: rgba(23, 23, 23, 0.8);
+    background-color: rgba(0, 32, 41, 0.85);    /* ink-black with high opacity */
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(0, 80, 102, 0.3);  /* dark-teal-2 border */
   }
 
   .light .glass-header {
@@ -239,18 +240,18 @@
 
   .glass-row:hover {
     transform: translateY(-2px);
-    background-color: rgba(39, 39, 42, 0.5);
+    background-color: rgba(0, 64, 82, 0.4);     /* dark-teal hover */
   }
 
-  /* Glass Buttons */
+  /* Glass Buttons - Teal Theme */
   .glass-button-primary {
-    background-color: #2563eb;
+    background-color: #00607a;              /* dark-teal-3 */
     transition: all 0.2s;
   }
 
   .glass-button-primary:hover {
-    background-color: #1d4ed8;
-    box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+    background-color: #005066;              /* dark-teal-2 */
+    box-shadow: 0 0 20px rgba(0, 96, 122, 0.5);
   }
 
   .glass-button-primary:active {
@@ -258,26 +259,27 @@
   }
 
   .glass-button-secondary {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(0, 80, 102, 0.15);   /* dark-teal-2 with transparency */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 96, 122, 0.3);    /* dark-teal-3 border */
     transition: all 0.2s;
   }
 
   .glass-button-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 96, 122, 0.25);
+    border-color: rgba(0, 96, 122, 0.5);
   }
 
   .glass-button-secondary:active {
     transform: scale(0.97);
   }
 
-  /* Ambient Background */
+  /* Ambient Background - Teal Glow */
   .ambient-bg-primary {
     position: absolute;
     border-radius: 50%;
-    background-color: rgba(37, 99, 235, 0.05);
+    background-color: rgba(0, 96, 122, 0.08);   /* dark-teal-3 ambient glow */
     filter: blur(150px);
     pointer-events: none;
   }
@@ -299,7 +301,7 @@
     }
   }
 
-  /* Custom Scrollbar */
+  /* Custom Scrollbar - Teal Theme */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -310,11 +312,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 96, 122, 0.3);      /* dark-teal-3 */
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 96, 122, 0.5);      /* brighter on hover */
   }
 }

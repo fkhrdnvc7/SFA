@@ -326,7 +326,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   );
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground overflow-hidden">
+    <div className="flex min-h-screen bg-background text-foreground">
       {/* Ambient Background */}
       <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[150px]"></div>
@@ -334,7 +334,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col h-screen sticky top-0 glass-sidebar w-64 z-50">
+      <aside className="hidden lg:flex flex-col fixed left-0 top-0 h-screen glass-sidebar w-64 z-50">
         <div className="p-8 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
             <span className="text-white font-bold text-lg">SFA</span>
@@ -354,7 +354,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       </aside>
 
       {/* Main column */}
-      <div className="flex min-h-screen flex-1 flex-col overflow-hidden">
+      <div className="flex min-h-screen flex-1 flex-col lg:ml-64">
         {/* Mobile Top bar */}
         <header className="flex lg:hidden items-center justify-between w-full px-3 h-16 sticky top-0 z-40 glass-header">
           {/* Left - Menu + Brand */}
@@ -405,7 +405,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         </header>
 
         {/* Desktop Header with Action Button */}
-        <header className="hidden lg:flex justify-end items-center px-10 py-6 z-30">
+        <header className="hidden lg:flex justify-end items-center px-10 py-6 z-30 sticky top-0 bg-background/80 backdrop-blur-sm">
           <div className="flex items-center gap-4">
             {isAdmin && (
               <button
